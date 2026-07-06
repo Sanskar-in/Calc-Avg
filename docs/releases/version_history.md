@@ -3,63 +3,77 @@
 // (c) Copyright Sanskar. All rights reserved.
 // Made by the Sanskar.
 // See this open source project created via Sanskar on GitHub to calculate the average of any numbers via using this link:- "https://www.github.com/Sanskar-in/Calc-Avg"
+//
+// Follow Sanskar or Creator on:-
+// GitHub:- "https://www.github.com/Sanskar-in"
+// YouTube:- "https://youtube.com/@Sanskar-in"
+// LinkedIn:- "https://www.linkedin.com/in/sanskar-in/"
+// X (Formally known as Twitter):- "https://www.x.com/Sanskar_in"
+// Need support:- supportramsandesh@gmail.com
+// Want to make your own projects, apps, and games via Sanskar:- sanskaryadavfrom2012to2026@gmail.com
 // =============================================================================
 -->
 
-# Calc-Avg Official Release History
+# Calc-Avg: Complete Version History & Changelog
 
-Welcome to the version history tracker for **Calc-Avg**. This document outlines the progression of the project from its foundational stages up to the ultimate v1.10 master release.
-
-All compiled binaries for these releases can be found safely archived in the `versions/` directory at the root of the project.
+This document chronicles the legendary evolution of the **Calc-Avg** project, highlighting the massive architectural milestones implemented from its foundational origins to its transformation into a multi-threaded web application.
 
 ---
 
-## 🏆 Current Stable Release
+## 🌟 Version 3.0: The Web Server & Sonification Update (LATEST)
+**Status:** Released
+- **Native HTTP Web Server (`server.c`):** Embedded a native TCP HTTP socket server using `<winsock2.h>`. The application can now host a beautiful HTML/CSS frontend on `localhost:8080`, intercept browser HTTP `GET` requests, dynamically calculate the average, and serve the results natively.
+- **Hardware Data Sonification (`audio.c`):** Embedded the low-level Windows kernel API `Beep()`. The engine now maps massive numerical data arrays into physical audio frequencies (Hertz), physically playing the data graph as a synthesized musical tone sequence through the computer hardware.
 
-### Version 1.10: The Multi-File Update (LATEST)
-- **Feature Addition:** Implemented the Multi-File Batch Processing engine (`calc_avg_multi_file`).
-- **Menu Update:** Added Option 18 allowing users to dynamically enter multiple files to aggregate.
-- **CLI Update:** Implemented the `--batch` flag, allowing power-users to instantly process massive arrays of files (e.g. `calc_avg --batch file1.txt file2.txt`).
-- **Documentation:** Major expansion of the `README.md` and the creation of a massive `docs/` wiki.
+## 🔐 Version 2.10: The Cybersecurity & Compression Update
+**Status:** Released
+- **SHA-256 Military Cryptography (`crypto.c`):** Engineered a standalone pure C implementation of the SHA-256 algorithm. Averages are mathematically encrypted using bitwise operations to generate irreversible 64-character hash signatures.
+- **Run-Length Big Data Compression:** Deployed an active interception algorithm that compresses repetitive data arrays down to the raw byte level (RLE), drastically optimizing RAM usage and calculating perfect averages from the compressed byte stream.
+
+## 🤖 Version 2.9: The Artificial Intelligence Update
+**Status:** Released
+- **Machine Learning (Predictive Linear Regression):** The engine mathematically calculates the Slope and Y-Intercept of a dataset to construct a trained predictive Line of Best Fit (`y = mx + b`), accurately projecting numerical forecasts for future time periods.
+
+## 🪟 Version 2.8: The Graphical User Interface (GUI) Update
+**Status:** Released
+- **Native Windows GUI (`gui.c`):** Bypassed the terminal to summon a true native Windows Application using `<windows.h>` (`CreateWindowEx`). Complete with interactive text boxes, physical buttons, popup Message Boxes, and real-time visual output.
+
+## 📐 Version 2.7: The Engineering Calculus Update
+**Status:** Released
+- **Numerical Integrals:** Implemented the Trapezoidal Rule to instantly calculate the accumulating total area under the curve of any dataset.
+- **True Derivatives:** Implemented the Central Difference Theorem to calculate the exact instantaneous rate of change across numerical data points.
+
+## 📈 Version 2.6: The Financial Markets Update
+**Status:** Released
+- **Simple Moving Average (SMA):** Integrated Wall-Street quantitative algorithms to calculate momentum across specified sliding window periods.
+- **Exponential Moving Average (EMA):** Applied dynamically weighted multipliers to calculate the exponentially smoothed market momentum across financial price arrays.
+
+## 🧊 Version 2.5: The Matrix Mathematics Update
+**Status:** Released
+- **2D Matrices:** Integrated multi-dimensional arrays, allowing the user to map complete X/Y grids. The engine simultaneously calculates and isolates the independent average of every Row, every Column, and the overall Matrix.
+
+## 🗃️ Version 2.4: The SQLite Database Integration
+**Status:** Released
+- **Native SQL Queries:** Integrated the official open-source `sqlite3.c` engine. The C binary parses actual `.sqlite` and `.db` database files, extracts specific numerical columns using SQL `SELECT` parameters, and calculates the exact average without CSV extraction.
+
+## ⚡ Version 2.3: The Multi-Threaded Parallel Processing Update
+**Status:** Released
+- **Hardware Core Utilization:** Implemented Windows `<windows.h>` Threading APIs. The C engine now spawns independent, parallel CPU threads for every single dataset when batch processing massive files simultaneously.
+
+## 🌐 Version 2.2: The Live Internet API Networking Update
+**Status:** Released
+- **Winsock API Streaming:** Enabled the C engine to open outbound TCP sockets on Port 80 to ping raw internet endpoints. The application natively strips HTTP headers, extracts raw JSON payloads, and calculates the averages of live cloud data streams.
+
+## 📄 Version 2.1: The HTML Report Generator
+**Status:** Released
+- **Automated Web Documentation:** The application dynamically generates and writes fully responsive `report.html` pages containing the calculated Mean, Median, Mode, Variance, and Standard Deviation inside beautifully formatted CSS tables.
+
+## 🚀 Version 1.0 - 2.0: The Foundation & Advanced Statistics
+**Status:** Released
+- **Core Statistical Logic:** Implementation of Mean, Median, Mode, Geometric Mean, Harmonic Mean, Variance, and Standard Deviation.
+- **Generators:** Integration of natural number generation, prime number validation algorithms, and Fibonacci sequences.
+- **File Parsing:** Custom-built tokenization engines to parse raw Data Text Files, Comma-Separated Values (`.csv`), and JSON state machines.
+- **Visuals:** Implemented full ANSI-color terminal graphics and the iconic green ASCII Bar Chart `(████████)` magnitude visualizer.
 
 ---
-
-## 📜 Previous Releases
-
-### Version 1.9: The Visual Update
-- **Feature Addition:** Implemented the ASCII Data Visualizer (`print_ascii_bar_chart`).
-- **UI Update:** Whenever a user calculates the average of an array (either via Menu Option 1 or via CLI arguments), the terminal now draws a mathematically scaled Green ASCII bar chart inside a Cyan border to visually map the data distribution before calculating the final mean.
-
-### Version 1.8: The Quality of Life Update
-- **Feature Addition:** Implemented the Native In-App History Viewer (`view_history`).
-- **UI Update:** Added Option 17. Users can now read the entire `history.log` directly inside the terminal seamlessly without having to open an external text editor. Error handling gracefully warns the user if the log file hasn't been created yet.
-
-### Version 1.7: The Power-User Update
-- **Feature Addition:** Fully implemented Command-Line Argument (CLI) parsing!
-- **Functionality:** Bypassed the interactive menu for instant calculations. Added support for instant array processing (`calc_avg 10 20 30`) and instant file processing (`calc_avg --file data.txt`).
-
-### Version 1.6: The True Statistics Update
-- **Feature Addition:** Added Variance (`calc_variance`) and Standard Deviation (`calc_standard_deviation`) calculations.
-- **UI Update:** Added conditional logic inside the menu (Options 15 & 16) to ask the user if they are calculating based on a *Population* or a *Sample*, adjusting the mathematical division (N vs N-1) dynamically for perfect statistical accuracy. 
-
-### Version 1.5: The Open-Source Branding Update
-- **UI Update:** Implemented the official Copyright Terminal Banner. Upon launching the tool, users are instantly greeted with a golden banner establishing the project as open-source by **Sanskar**, linking directly to the GitHub repository.
-
-### Version 1.4: The Premium Interface Update
-- **Feature Addition:** Added the Range-Based / Filtered Average function (Option 14).
-- **UI Update:** Completely overhauled the entire terminal interface using standard ANSI escape sequences. The menu is now beautifully rendered with Cyan headers, Yellow options, Red error messages, and bold Green success outputs. 
-
-### Version 1.3: The Data Persistence Update
-- **Feature Addition:** Integrated Advanced Statistical algorithms: Median, Mode, Geometric Mean, and Harmonic Mean. Added Weighted Averages.
-- **Data Update:** Built the `log_history` function. The program now silently saves every single calculation to a background `history.log` file. Also added the ability to export a specific result to a clean `results.txt` file.
-
-### Version 1.2: The Community Update
-- **Feature Addition:** Implemented cross-platform system redirection (Windows, macOS, Linux).
-- **UI Update:** Added an option in the menu to instantly launch the user's default web browser and redirect them directly to the official GitHub repository for Calc-Avg.
-
-### Version 1.1: The Mathematical Sequence Update
-- **Feature Addition:** Implemented O(1) mathematical algorithms to calculate the average of Natural, Odd, and Even numbers. 
-- **Feature Addition:** Built an optimized `O(sqrt(N))` algorithm for Prime number averages, and a dynamic loop for Fibonacci Sequence averages. Implemented the basic `calc_avg_from_file` single-file reading algorithm.
-
-### Version 1.0: The Foundation
-- **Base Release:** The core skeleton of the project. Implemented the infinite `while` loop for the interactive menu and the dynamic memory allocation (`malloc`) system for calculating simple means on the fly.
+*Calc-Avg is a 100% open-source C framework developed by Sanskar.*
