@@ -498,3 +498,85 @@ double calc_variance(double numbers[], int count, bool is_population) {
 double calc_standard_deviation(double numbers[], int count, bool is_population) {
     return sqrt(calc_variance(numbers, count, is_population));
 }
+
+#if defined(_WIN32)
+typedef struct {
+    const char *filename;
+    double sum;
+    int count;
+} ThreadData;
+
+DWORD WINAPI ProcessFileThread(LPVOID lpParam) {
+    ThreadData *data = (ThreadData*)lpParam;
+    data->sum = 0.0;
+    data->count = 0;
+
+    FILE *file = fopen(data->filename, "r");
+    if (file == NULL) {
+        // Fallback to CSV/JSON if not a pure txt? To keep it robust we can just check extensions,
+        // but for simplicity, let's just do standard fscanf. If the user wants full JSON/CSV threading
+        // we'd route through the specific parsers. We will use standard text parsing.
+        printf("Error: Could not open file %s for thread processing.\n", data->filename);
+        return 1;
+    }
+
+    // A slightly robust parser that mimics calc_avg_from_file's simple parser
+    char buffer[256];
+    while (fscanf(file, "%255s", buffer) == 1) {
+        char *endptr;
+        double number = strtod(buffer, &endptr);
+        if (endptr != buffer) {
+            data->sum += number;
+            data->count++;
+        }
+    }
+    fclose(file);
+    return 0;
+}
+#endif
+
+double calc_avg_from_batch_threaded(char *filenames[], int file_count) {
+    if (file_count <= 0) return 0.0;
+    
+#if defined(_WIN32)
+    printf("Starting parallel multi-threaded batch processing for %d files on Windows...\n", file_count);
+    HANDLE *threads = (HANDLE*)malloc(file_count * sizeof(HANDLE));
+    ThreadData *thread_data = (ThreadData*)malloc(file_count * sizeof(ThreadData));
+    
+    double total_sum = 0.0;
+    int total_count = 0;
+
+    for (int i = 0; i < file_count; i++) {
+        thread_data[i].filename = filenames[i];
+        thread_data[i].sum = 0.0;
+        thread_data[i].count = 0;
+        threads[i] = CreateThread(NULL, 0, ProcessFileThread, &thread_data[i], 0, NULL);
+        if (threads[i] == NULL) {
+            printf("Error: Failed to create thread for %s.\n", filenames[i]);
+        }
+    }
+
+    // Wait for all threads to complete
+    WaitForMultipleObjects(file_count, threads, TRUE, INFINITE);
+
+    for (int i = 0; i < file_count; i++) {
+        total_sum += thread_data[i].sum;
+        total_count += thread_data[i].count;
+        if (threads[i] != NULL) {
+            CloseHandle(threads[i]);
+        }
+    }
+
+    free(threads);
+    free(thread_data);
+
+    if (total_count == 0) {
+        printf("No valid numbers found in any file.\n");
+        return 0.0;
+    }
+    return total_sum / total_count;
+#else
+    printf("Multi-threading requires Windows <windows.h>. Falling back to single-threaded batch processing...\n");
+    return calc_avg_from_batch(filenames, file_count);
+#endif
+}

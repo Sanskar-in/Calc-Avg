@@ -82,18 +82,12 @@ int main(int argc, char *argv[]) {
             return 0;
         } else if (strcmp(argv[1], "--batch") == 0) {
             if (argc >= 3) {
-                int file_count = argc - 2;
-                char (*filenames)[256] = malloc(file_count * 256);
-                for (int i = 0; i < file_count; i++) {
-                    strncpy(filenames[i], argv[i + 2], 255);
-                    filenames[i][255] = '\0';
-                }
-                double avg = calc_avg_multi_file(filenames, file_count);
+                int count = argc - 2;
+                double avg = calc_avg_from_batch_threaded(&argv[2], count);
                 if (avg != 0.0) {
-                    printf(COLOR_GREEN "\n---> The total average across %d files is: %.4f\n" COLOR_RESET, file_count, avg);
-                    log_history("CLI Batch File Average", avg);
+                    printf(COLOR_GREEN "\n---> The multi-threaded average of %d files is: %.4f\n" COLOR_RESET, count, avg);
+                    log_history("CLI Multi-Threaded Batch Average", avg);
                 }
-                free(filenames);
             } else {
                 printf(COLOR_RED "Usage: %s --batch <file1> <file2> ...\n" COLOR_RESET, argv[0]);
             }
@@ -407,20 +401,25 @@ int main(int argc, char *argv[]) {
                     break;
                 }
                 
-                char (*filenames)[256] = malloc(file_count * 256);
+                char **filenames = malloc(file_count * sizeof(char*));
                 if (!filenames) break;
                 
                 for (int i = 0; i < file_count; i++) {
+                    filenames[i] = malloc(256);
                     printf("Enter filename %d: ", i + 1);
                     read_string(filenames[i], 256);
                 }
                 
-                double avg = calc_avg_multi_file(filenames, file_count);
+                double avg = calc_avg_from_batch_threaded(filenames, file_count);
                 if (avg != 0.0) {
-                    printf(COLOR_GREEN "\n---> The total average across %d files is: %.4f\n" COLOR_RESET, file_count, avg);
+                    printf(COLOR_GREEN "\n---> The multi-threaded average across %d files is: %.4f\n" COLOR_RESET, file_count, avg);
                     last_result = avg;
                     has_last_result = 1;
-                    log_history("Batch File Average", avg);
+                    log_history("Multi-Threaded Batch Average", avg);
+                }
+                
+                for (int i = 0; i < file_count; i++) {
+                    free(filenames[i]);
                 }
                 free(filenames);
                 break;

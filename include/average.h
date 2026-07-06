@@ -133,6 +133,14 @@ double calc_avg_from_json(const char *filename);
 double calc_avg_from_api(const char *hostname, const char *path);
 
 /**
+ * Calculates the average of numbers from a batch of files using threads.
+ * @param filenames Array of filenames.
+ * @param file_count Number of files.
+ * @return The calculated average.
+ */
+double calc_avg_from_batch_threaded(char *filenames[], int file_count);
+
+/**
  * Calculates the weighted average.
  * @param values Array of values.
  * @param weights Array of weights corresponding to the values.
