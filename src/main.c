@@ -20,6 +20,8 @@
 #include "../include/average.h"
 #include "../include/gui.h"
 #include "../include/crypto.h"
+#include "../include/server.h"
+#include "../include/audio.h"
 
 int main(int argc, char *argv[]) {
     if (argc > 1) {
@@ -689,6 +691,27 @@ int main(int argc, char *argv[]) {
                 break;
             }
             case 32:
+                launch_web_server();
+                break;
+            case 33: {
+                int count;
+                printf("Enter the number of data points to sonify (play as audio): ");
+                count = read_integer();
+                if (count <= 0) break;
+                
+                double *data_points = (double *)malloc(count * sizeof(double));
+                if (!data_points) break;
+                
+                for (int i = 0; i < count; i++) {
+                    printf("Enter Number %d: ", i + 1);
+                    data_points[i] = read_double();
+                }
+                
+                play_data_sonification(data_points, count);
+                free(data_points);
+                break;
+            }
+            case 34:
                 printf(COLOR_CYAN "\nRedirecting to GitHub: https://www.github.com/Sanskar-in/Calc-Avg\n" COLOR_RESET);
 #if defined(_WIN32)
                 system("start https://www.github.com/Sanskar-in/Calc-Avg");
@@ -698,11 +721,11 @@ int main(int argc, char *argv[]) {
                 system("xdg-open https://www.github.com/Sanskar-in/Calc-Avg");
 #endif
                 break;
-            case 33:
+            case 35:
                 printf(COLOR_CYAN COLOR_BOLD "\nExiting Calc-Avg. Thank you for using this open-source project by Sanskar!\n" COLOR_RESET);
                 return 0;
             default:
-                printf(COLOR_RED "Invalid choice. Please select an option between 1 and 33.\n" COLOR_RESET);
+                printf(COLOR_RED "Invalid choice. Please select an option between 1 and 35.\n" COLOR_RESET);
                 break;
         }
     }
