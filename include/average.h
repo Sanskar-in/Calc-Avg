@@ -159,6 +159,14 @@ double calc_avg_from_batch_threaded(char *filenames[], int file_count);
 double calc_avg_matrix(int rows, int cols, double **matrix);
 
 /**
+ * Calculates and prints the Simple Moving Average (SMA) and Exponential Moving Average (EMA).
+ * @param prices Array of sequential prices.
+ * @param count Number of prices in the array.
+ * @param window_size The sliding window period (e.g. 5 days).
+ */
+void calc_financial_moving_averages(double prices[], int count, int window_size);
+
+/**
  * Calculates the weighted average.
  * @param values Array of values.
  * @param weights Array of weights corresponding to the values.

@@ -570,7 +570,32 @@ int main(int argc, char *argv[]) {
                 free(matrix);
                 break;
             }
-            case 26:
+            case 26: {
+                int count, window_size;
+                printf("Enter the total number of periods (e.g. days) to analyze: ");
+                count = read_integer();
+                if (count <= 0) {
+                    printf(COLOR_RED "Please enter a positive number.\n" COLOR_RESET);
+                    break;
+                }
+                
+                double *prices = (double *)malloc(count * sizeof(double));
+                if (!prices) break;
+                
+                for (int i = 0; i < count; i++) {
+                    printf("Enter Price for Period %d: ", i + 1);
+                    prices[i] = read_double();
+                }
+                
+                printf("Enter the Moving Average Window Size (e.g. 5, 14, 50): ");
+                window_size = read_integer();
+                
+                calc_financial_moving_averages(prices, count, window_size);
+                
+                free(prices);
+                break;
+            }
+            case 27:
                 printf(COLOR_CYAN "\nRedirecting to GitHub: https://www.github.com/Sanskar-in/Calc-Avg\n" COLOR_RESET);
 #if defined(_WIN32)
                 system("start https://www.github.com/Sanskar-in/Calc-Avg");
@@ -580,11 +605,11 @@ int main(int argc, char *argv[]) {
                 system("xdg-open https://www.github.com/Sanskar-in/Calc-Avg");
 #endif
                 break;
-            case 27:
+            case 28:
                 printf(COLOR_CYAN COLOR_BOLD "\nExiting Calc-Avg. Thank you for using this open-source project by Sanskar!\n" COLOR_RESET);
                 return 0;
             default:
-                printf(COLOR_RED "Invalid choice. Please select an option between 1 and 27.\n" COLOR_RESET);
+                printf(COLOR_RED "Invalid choice. Please select an option between 1 and 28.\n" COLOR_RESET);
                 break;
         }
     }

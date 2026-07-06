@@ -666,3 +666,54 @@ double calc_avg_matrix(int rows, int cols, double **matrix) {
     
     return total_sum / (rows * cols);
 }
+
+void calc_financial_moving_averages(double prices[], int count, int window_size) {
+    if (count <= 0 || window_size <= 0) return;
+    if (window_size > count) {
+        printf(COLOR_RED "Window size cannot be greater than the number of prices.\n" COLOR_RESET);
+        return;
+    }
+    
+    printf("\n" COLOR_CYAN COLOR_BOLD "--- Financial Market Analysis (%d-Period Moving Averages) ---" COLOR_RESET "\n\n", window_size);
+    printf("Period | Price      | SMA (Simple) | EMA (Exponential)\n");
+    printf("------------------------------------------------------\n");
+    
+    double ema_multiplier = 2.0 / (window_size + 1);
+    double prev_ema = 0.0;
+    
+    for (int i = 0; i < count; i++) {
+        double current_price = prices[i];
+        
+        // Calculate SMA
+        double sma = 0.0;
+        if (i >= window_size - 1) {
+            double sum = 0.0;
+            for (int j = i - window_size + 1; j <= i; j++) {
+                sum += prices[j];
+            }
+            sma = sum / window_size;
+        }
+        
+        // Calculate EMA
+        double ema = 0.0;
+        if (i == window_size - 1) {
+            // First EMA is usually seeded with the first SMA
+            ema = sma;
+            prev_ema = ema;
+        } else if (i > window_size - 1) {
+            ema = (current_price * ema_multiplier) + (prev_ema * (1.0 - ema_multiplier));
+            prev_ema = ema;
+        }
+        
+        // Print Row
+        printf("%6d | %10.2f | ", i + 1, current_price);
+        
+        if (i >= window_size - 1) {
+            printf(COLOR_YELLOW "%12.2f" COLOR_RESET " | ", sma);
+            printf(COLOR_GREEN "%17.2f" COLOR_RESET "\n", ema);
+        } else {
+            printf("           - |                 -\n");
+        }
+    }
+    printf("\n");
+}
