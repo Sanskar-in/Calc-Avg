@@ -7,11 +7,13 @@
 
 CC = gcc
 CFLAGS = -Wall -Wextra -Iinclude
+LDFLAGS = -lm -lgdi32
+SRC = src/main.c src/average.c src/utils.c src/gui.c
 
 all: calc_avg
 
-calc_avg: src/main.c src/average.c src/utils.c
-	$(CC) $(CFLAGS) src/main.c src/average.c src/utils.c -o calc_avg -lm
+calc_avg: $(SRC)
+	$(CC) $(CFLAGS) $(SRC) -o calc_avg $(LDFLAGS)
 
 clean:
 	del /Q calc_avg.exe calc_avg 2>nul || rm -f calc_avg.exe calc_avg

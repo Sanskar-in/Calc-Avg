@@ -51,8 +51,9 @@ void display_menu() {
     printf(COLOR_YELLOW "25. Average of a 2D Matrix\n" COLOR_RESET);
     printf(COLOR_YELLOW "26. Financial Market Analysis (SMA & EMA)\n" COLOR_RESET);
     printf(COLOR_YELLOW "27. Engineering Calculus (Derivatives & Integrals)\n" COLOR_RESET);
-    printf(COLOR_YELLOW "28. See Source Code on GitHub\n" COLOR_RESET);
-    printf(COLOR_RED "29. Exit\n" COLOR_RESET);
+    printf(COLOR_YELLOW "28. Launch Graphical User Interface (GUI)\n" COLOR_RESET);
+    printf(COLOR_YELLOW "29. See Source Code on GitHub\n" COLOR_RESET);
+    printf(COLOR_RED "30. Exit\n" COLOR_RESET);
     printf(COLOR_CYAN COLOR_BOLD "=========================================\n" COLOR_RESET);
     printf(COLOR_GREEN "Enter your choice: " COLOR_RESET);
 }
