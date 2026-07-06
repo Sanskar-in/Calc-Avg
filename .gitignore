@@ -1,0 +1,39 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Specifically allow the versions folder to track compiled release binaries
+!versions/**/*.exe
+
+# Application specific files (logs, temp data)
+history.log
+results.txt
+report.html
+temp_api_data.json
+test.csv
+test.json
