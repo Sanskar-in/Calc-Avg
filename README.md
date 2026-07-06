@@ -17,10 +17,11 @@ This tool goes far beyond simple addition and division—it is a comprehensive, 
 
 ## 🌟 Comprehensive Feature List
 
-Calc-Avg has evolved through to **Version 2.8** to include a massive suite of capabilities:
+Calc-Avg has evolved through to **Version 2.9** to include a massive suite of capabilities:
 
 ### 1. Advanced Statistical & Mathematical Engine
 
+- **Predictive Artificial Intelligence (Machine Learning)**: The C engine can now predict the future! Input an array of historical data points, and the algorithm will calculate the Linear Regression to construct a Line of Best Fit (`y = mx + b`), generating exact predictive mathematical outputs for future periods!
 - **True Graphical User Interface (GUI)**: The ultimate final boss of C programming! Bypassing the terminal entirely, Calc-Avg can now summon a true native Windows Desktop Application using the Win32 API (`<windows.h>`). Complete with physical Textboxes, Buttons, and Labels to calculate averages visually with a mouse!
 - **Engineering Calculus**: High-level Physics mathematics! Input an array of data points and a step interval to instantly calculate the **Numerical Integral** (total area under the curve) using the Trapezoidal Rule, and the **Derivative** (rate of change) using the Central Difference Theorem!
 - **Financial Market Analysis**: Quantitative Wall-Street algorithms implemented! Input historical stock prices and calculate the **Simple Moving Average (SMA)** and the dynamically weighted **Exponential Moving Average (EMA)** to map market momentum in a beautiful ASCII table!

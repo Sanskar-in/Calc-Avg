@@ -757,3 +757,61 @@ void calc_engineering_calculus(double data_points[], int count, double step_size
     }
     printf("\n");
 }
+
+void calc_linear_regression(double data_points[], int count, int future_predictions) {
+    if (count < 2) {
+        printf(COLOR_RED "Linear Regression requires at least 2 historical data points to train the model.\n" COLOR_RESET);
+        return;
+    }
+    
+    double sum_x = 0.0, sum_y = 0.0, sum_xy = 0.0, sum_x2 = 0.0;
+    
+    for (int i = 0; i < count; i++) {
+        double x = (double)(i + 1); // Time period (1, 2, 3...)
+        double y = data_points[i];
+        
+        sum_x += x;
+        sum_y += y;
+        sum_xy += (x * y);
+        sum_x2 += (x * x);
+    }
+    
+    // Calculate Slope (m) and Y-Intercept (b)
+    double denominator = (count * sum_x2) - (sum_x * sum_x);
+    if (denominator == 0) {
+        printf(COLOR_RED "Mathematical Error: Cannot calculate regression (divide by zero).\n" COLOR_RESET);
+        return;
+    }
+    
+    double m = ((count * sum_xy) - (sum_x * sum_y)) / denominator;
+    double b = (sum_y - (m * sum_x)) / count;
+    
+    printf("\n" COLOR_CYAN COLOR_BOLD "--- Machine Learning: Predictive Linear Regression ---" COLOR_RESET "\n\n");
+    printf(COLOR_YELLOW "Trained Mathematical Model (Line of Best Fit): " COLOR_RESET "y = %.4fx + %.4f\n\n", m, b);
+    
+    printf(" Period |   Actual Value   | Predicted Value\n");
+    printf("---------------------------------------------\n");
+    
+    // Print Historical Data
+    for (int i = 0; i < count; i++) {
+        double x = (double)(i + 1);
+        double predicted_y = (m * x) + b;
+        
+        printf("%7d | %16.4f | %15.4f\n", i + 1, data_points[i], predicted_y);
+    }
+    
+    // Predict Future Data
+    if (future_predictions > 0) {
+        printf("---------------------------------------------\n");
+        printf(COLOR_GREEN "        FUTURE PREDICTIONS (AI GENERATED)\n" COLOR_RESET);
+        printf("---------------------------------------------\n");
+        
+        for (int i = count; i < count + future_predictions; i++) {
+            double x = (double)(i + 1);
+            double predicted_y = (m * x) + b;
+            
+            printf(COLOR_GREEN "%7d" COLOR_RESET " |                - | " COLOR_GREEN "%15.4f" COLOR_RESET "\n", i + 1, predicted_y);
+        }
+    }
+    printf("\n");
+}

@@ -625,7 +625,33 @@ int main(int argc, char *argv[]) {
             case 28:
                 launch_native_gui();
                 break;
-            case 29:
+            case 29: {
+                int count, predictions;
+                printf("Enter the number of historical data points to train the AI: ");
+                count = read_integer();
+                if (count < 2) {
+                    printf(COLOR_RED "Linear Regression requires at least 2 data points.\n" COLOR_RESET);
+                    break;
+                }
+                
+                double *data_points = (double *)malloc(count * sizeof(double));
+                if (!data_points) break;
+                
+                for (int i = 0; i < count; i++) {
+                    printf("Enter Historical Data Point %d: ", i + 1);
+                    data_points[i] = read_double();
+                }
+                
+                printf("Enter the number of future periods to predict: ");
+                predictions = read_integer();
+                if (predictions < 0) predictions = 0;
+                
+                calc_linear_regression(data_points, count, predictions);
+                
+                free(data_points);
+                break;
+            }
+            case 30:
                 printf(COLOR_CYAN "\nRedirecting to GitHub: https://www.github.com/Sanskar-in/Calc-Avg\n" COLOR_RESET);
 #if defined(_WIN32)
                 system("start https://www.github.com/Sanskar-in/Calc-Avg");
@@ -635,11 +661,11 @@ int main(int argc, char *argv[]) {
                 system("xdg-open https://www.github.com/Sanskar-in/Calc-Avg");
 #endif
                 break;
-            case 30:
+            case 31:
                 printf(COLOR_CYAN COLOR_BOLD "\nExiting Calc-Avg. Thank you for using this open-source project by Sanskar!\n" COLOR_RESET);
                 return 0;
             default:
-                printf(COLOR_RED "Invalid choice. Please select an option between 1 and 30.\n" COLOR_RESET);
+                printf(COLOR_RED "Invalid choice. Please select an option between 1 and 31.\n" COLOR_RESET);
                 break;
         }
     }

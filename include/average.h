@@ -175,6 +175,14 @@ void calc_financial_moving_averages(double prices[], int count, int window_size)
 void calc_engineering_calculus(double data_points[], int count, double step_size);
 
 /**
+ * Calculates the Line of Best Fit (Linear Regression) and predicts future data points.
+ * @param data_points Array of historical data points.
+ * @param count Number of historical data points.
+ * @param future_predictions Number of future periods to predict.
+ */
+void calc_linear_regression(double data_points[], int count, int future_predictions);
+
+/**
  * Calculates the weighted average.
  * @param values Array of values.
  * @param weights Array of weights corresponding to the values.
