@@ -150,6 +150,15 @@ double calc_avg_from_sqlite(const char *db_filename, const char *table_name, con
 double calc_avg_from_batch_threaded(char *filenames[], int file_count);
 
 /**
+ * Calculates the total, row, and column averages of a 2D matrix.
+ * @param rows Number of rows.
+ * @param cols Number of columns.
+ * @param matrix The 2D array matrix.
+ * @return The total average of the entire matrix.
+ */
+double calc_avg_matrix(int rows, int cols, double **matrix);
+
+/**
  * Calculates the weighted average.
  * @param values Array of values.
  * @param weights Array of weights corresponding to the values.

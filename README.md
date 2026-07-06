@@ -17,10 +17,11 @@ This tool goes far beyond simple addition and division—it is a comprehensive, 
 
 ## 🌟 Comprehensive Feature List
 
-Calc-Avg has evolved through to **Version 2.4** to include a massive suite of capabilities:
+Calc-Avg has evolved through to **Version 2.5** to include a massive suite of capabilities:
 
 ### 1. Advanced Statistical & Mathematical Engine
 
+- **2D Matrix Mathematics**: Map an entire X/Y grid! The engine will construct a beautiful ASCII matrix and simultaneously calculate the independent average of every single Row, every single Column, and the Total overall Matrix.
 - **Dynamic Average**: Enter any arbitrary amount of numbers on the fly to calculate their mean.
 - **Sequence Generators**: Instantly compute the average of the first _N_ Natural numbers, Odd numbers, Even numbers, Prime numbers (using an optimized primality testing algorithm), or Fibonacci sequence numbers.
 - **Advanced Statistical Averages**: Go beyond the mean. Accurately calculate the **Median**, **Mode**, **Geometric Mean**, and **Harmonic Mean**.

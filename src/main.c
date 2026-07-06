@@ -534,7 +534,43 @@ int main(int argc, char *argv[]) {
                 }
                 break;
             }
-            case 25:
+            case 25: {
+                int rows, cols;
+                printf("Enter the number of Rows: ");
+                rows = read_integer();
+                printf("Enter the number of Columns: ");
+                cols = read_integer();
+                
+                if (rows <= 0 || cols <= 0) {
+                    printf(COLOR_RED "Invalid dimensions.\n" COLOR_RESET);
+                    break;
+                }
+                
+                double **matrix = (double **)malloc(rows * sizeof(double *));
+                for (int i = 0; i < rows; i++) {
+                    matrix[i] = (double *)malloc(cols * sizeof(double));
+                }
+                
+                for (int i = 0; i < rows; i++) {
+                    for (int j = 0; j < cols; j++) {
+                        printf("Enter value for Row %d, Col %d: ", i + 1, j + 1);
+                        matrix[i][j] = read_double();
+                    }
+                }
+                
+                double avg = calc_avg_matrix(rows, cols, matrix);
+                printf(COLOR_GREEN "---> The Total Average of the entire %dx%d matrix is: %.4f\n" COLOR_RESET, rows, cols, avg);
+                last_result = avg;
+                has_last_result = 1;
+                log_history("2D Matrix Average", avg);
+                
+                for (int i = 0; i < rows; i++) {
+                    free(matrix[i]);
+                }
+                free(matrix);
+                break;
+            }
+            case 26:
                 printf(COLOR_CYAN "\nRedirecting to GitHub: https://www.github.com/Sanskar-in/Calc-Avg\n" COLOR_RESET);
 #if defined(_WIN32)
                 system("start https://www.github.com/Sanskar-in/Calc-Avg");
@@ -544,11 +580,11 @@ int main(int argc, char *argv[]) {
                 system("xdg-open https://www.github.com/Sanskar-in/Calc-Avg");
 #endif
                 break;
-            case 26:
+            case 27:
                 printf(COLOR_CYAN COLOR_BOLD "\nExiting Calc-Avg. Thank you for using this open-source project by Sanskar!\n" COLOR_RESET);
                 return 0;
             default:
-                printf(COLOR_RED "Invalid choice. Please select an option between 1 and 26.\n" COLOR_RESET);
+                printf(COLOR_RED "Invalid choice. Please select an option between 1 and 27.\n" COLOR_RESET);
                 break;
         }
     }

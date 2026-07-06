@@ -627,3 +627,42 @@ double calc_avg_from_sqlite(const char *db_filename, const char *table_name, con
     
     return sum / count;
 }
+
+#include "../include/utils.h"
+
+double calc_avg_matrix(int rows, int cols, double **matrix) {
+    if (rows <= 0 || cols <= 0 || matrix == NULL) return 0.0;
+    
+    double total_sum = 0.0;
+    
+    printf("\n" COLOR_CYAN COLOR_BOLD "--- 2D Matrix Analysis ---" COLOR_RESET "\n\n");
+    
+    for (int i = 0; i < rows; i++) {
+        double row_sum = 0.0;
+        printf("Row %d: | ", i + 1);
+        for (int j = 0; j < cols; j++) {
+            printf("%7.2f ", matrix[i][j]);
+            row_sum += matrix[i][j];
+            total_sum += matrix[i][j];
+        }
+        printf("| -> " COLOR_YELLOW "Avg: %7.2f" COLOR_RESET "\n", row_sum / cols);
+    }
+    
+    printf("--------");
+    for (int j = 0; j < cols; j++) {
+        printf("---------");
+    }
+    printf("\n");
+    
+    printf("Col Avg:  ");
+    for (int j = 0; j < cols; j++) {
+        double col_sum = 0.0;
+        for (int i = 0; i < rows; i++) {
+            col_sum += matrix[i][j];
+        }
+        printf(COLOR_GREEN "%7.2f " COLOR_RESET, col_sum / rows);
+    }
+    printf("\n\n");
+    
+    return total_sum / (rows * cols);
+}
