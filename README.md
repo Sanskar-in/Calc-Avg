@@ -17,7 +17,7 @@ This tool goes far beyond simple addition and division—it is a comprehensive, 
 
 ## 🌟 Comprehensive Feature List
 
-Calc-Avg has evolved through to **Version 2.3** to include a massive suite of capabilities:
+Calc-Avg has evolved through to **Version 2.4** to include a massive suite of capabilities:
 
 ### 1. Advanced Statistical & Mathematical Engine
 
@@ -30,8 +30,9 @@ Calc-Avg has evolved through to **Version 2.3** to include a massive suite of ca
 
 ### 2. High-Performance Data & Network Processing
 
-- **File Reader**: Calculate the average of hundreds of thousands of numbers stored in a single text file (e.g., `numbers.txt`).
+- **Native SQLite Database Analytics**: Don't waste time exporting to CSV! Point Calc-Avg directly to a `.sqlite` or `.db` database file, and it will execute raw SQL Queries to instantly extract and average numerical columns!
 - **Parallel Multi-Threaded Batch Processing**: Pass multiple files at once, and the C engine will utilize `<windows.h>` to spin up independent CPU threads to parse and analyze every single file simultaneously across your processor cores, slashing analysis time!
+- **File Reader**: Calculate the average of hundreds of thousands of numbers stored in a single text file (e.g., `numbers.txt`).
 - **Enterprise Data Parsing**: Full integration of custom C-based parsers to extract raw numerical data directly from Excel Spreadsheets (`.csv`) and web data objects (`.json`)!
 - **Live Internet API Networking**: Calculates averages using real-time data from the internet! It utilizes raw Windows Sockets (`winsock2.h`) to connect to APIs via HTTP GET requests, extracting and processing JSON payloads dynamically.
 

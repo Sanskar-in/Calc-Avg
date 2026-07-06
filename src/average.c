@@ -580,3 +580,50 @@ double calc_avg_from_batch_threaded(char *filenames[], int file_count) {
     return calc_avg_from_batch(filenames, file_count);
 #endif
 }
+
+#include "../third_party/sqlite/sqlite3.h"
+
+double calc_avg_from_sqlite(const char *db_filename, const char *table_name, const char *column_name) {
+    sqlite3 *db;
+    sqlite3_stmt *res;
+    
+    int rc = sqlite3_open(db_filename, &db);
+    
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+        sqlite3_close(db);
+        return 0.0;
+    }
+    
+    // Construct the SQL Query dynamically
+    char sql[512];
+    snprintf(sql, sizeof(sql), "SELECT %s FROM %s;", column_name, table_name);
+    
+    rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
+    
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
+        sqlite3_close(db);
+        return 0.0;
+    }
+    
+    double sum = 0.0;
+    int count = 0;
+    
+    while (sqlite3_step(res) == SQLITE_ROW) {
+        // Read the column as a double natively via SQLite engine
+        double val = sqlite3_column_double(res, 0);
+        sum += val;
+        count++;
+    }
+    
+    sqlite3_finalize(res);
+    sqlite3_close(db);
+    
+    if (count == 0) {
+        printf("No valid data found in column %s of table %s.\n", column_name, table_name);
+        return 0.0;
+    }
+    
+    return sum / count;
+}

@@ -133,6 +133,15 @@ double calc_avg_from_json(const char *filename);
 double calc_avg_from_api(const char *hostname, const char *path);
 
 /**
+ * Connects to a local SQLite Database, executes an SQL Query, and calculates the average of a specific numerical column.
+ * @param db_filename The path to the SQLite database (e.g., database.db)
+ * @param table_name The name of the table to query.
+ * @param column_name The name of the numerical column to average.
+ * @return The calculated average, or 0.0 on error.
+ */
+double calc_avg_from_sqlite(const char *db_filename, const char *table_name, const char *column_name);
+
+/**
  * Calculates the average of numbers from a batch of files using threads.
  * @param filenames Array of filenames.
  * @param file_count Number of files.

@@ -43,6 +43,17 @@ int main(int argc, char *argv[]) {
                 printf(COLOR_RED "Usage: %s --api <hostname> <path>\n" COLOR_RESET, argv[0]);
             }
             return 0;
+        } else if (strcmp(argv[1], "--sqlite") == 0) {
+            if (argc == 5) {
+                double avg = calc_avg_from_sqlite(argv[2], argv[3], argv[4]);
+                if (avg != 0.0) {
+                    printf(COLOR_GREEN "\n---> The average of %s.%s is: %.4f\n" COLOR_RESET, argv[3], argv[4], avg);
+                    log_history("CLI SQLite Average", avg);
+                }
+            } else {
+                printf(COLOR_RED "Usage: %s --sqlite <db_file> <table_name> <column_name>\n" COLOR_RESET, argv[0]);
+            }
+            return 0;
         } else if (strcmp(argv[1], "--report") == 0) {
             if (argc >= 3) {
                 int count = argc - 2;
@@ -503,7 +514,27 @@ int main(int argc, char *argv[]) {
                 printf("Want to make your own projects, apps, and games via Sanskar:- " COLOR_GREEN "sanskaryadavfrom2012to2026@gmail.com\n" COLOR_RESET);
                 printf(COLOR_CYAN COLOR_BOLD "=========================================\n" COLOR_RESET);
                 break;
-            case 24:
+            case 24: {
+                char db_filename[256];
+                char table_name[256];
+                char column_name[256];
+                printf("Enter the SQLite Database filename (e.g., data.db): ");
+                read_string(db_filename, sizeof(db_filename));
+                printf("Enter the Table Name: ");
+                read_string(table_name, sizeof(table_name));
+                printf("Enter the Numerical Column Name: ");
+                read_string(column_name, sizeof(column_name));
+                
+                double avg = calc_avg_from_sqlite(db_filename, table_name, column_name);
+                if (avg != 0.0) {
+                    printf(COLOR_GREEN "\n---> The average of %s.%s in '%s' is: %.4f\n" COLOR_RESET, table_name, column_name, db_filename, avg);
+                    last_result = avg;
+                    has_last_result = 1;
+                    log_history("SQLite Database Average", avg);
+                }
+                break;
+            }
+            case 25:
                 printf(COLOR_CYAN "\nRedirecting to GitHub: https://www.github.com/Sanskar-in/Calc-Avg\n" COLOR_RESET);
 #if defined(_WIN32)
                 system("start https://www.github.com/Sanskar-in/Calc-Avg");
@@ -513,11 +544,11 @@ int main(int argc, char *argv[]) {
                 system("xdg-open https://www.github.com/Sanskar-in/Calc-Avg");
 #endif
                 break;
-            case 25:
+            case 26:
                 printf(COLOR_CYAN COLOR_BOLD "\nExiting Calc-Avg. Thank you for using this open-source project by Sanskar!\n" COLOR_RESET);
                 return 0;
             default:
-                printf(COLOR_RED "Invalid choice. Please select an option between 1 and 25.\n" COLOR_RESET);
+                printf(COLOR_RED "Invalid choice. Please select an option between 1 and 26.\n" COLOR_RESET);
                 break;
         }
     }

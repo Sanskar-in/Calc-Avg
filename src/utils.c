@@ -47,8 +47,9 @@ void display_menu() {
     printf(COLOR_YELLOW "21. Generate HTML Report from Array\n" COLOR_RESET);
     printf(COLOR_YELLOW "22. Average from Live Internet API\n" COLOR_RESET);
     printf(COLOR_YELLOW "23. Follow Sanskar / Creator Support\n" COLOR_RESET);
-    printf(COLOR_YELLOW "24. See Source Code on GitHub\n" COLOR_RESET);
-    printf(COLOR_RED "25. Exit\n" COLOR_RESET);
+    printf(COLOR_YELLOW "24. Average from SQLite Database\n" COLOR_RESET);
+    printf(COLOR_YELLOW "25. See Source Code on GitHub\n" COLOR_RESET);
+    printf(COLOR_RED "26. Exit\n" COLOR_RESET);
     printf(COLOR_CYAN COLOR_BOLD "=========================================\n" COLOR_RESET);
     printf(COLOR_GREEN "Enter your choice: " COLOR_RESET);
 }
