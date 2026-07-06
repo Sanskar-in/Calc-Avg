@@ -183,6 +183,13 @@ void calc_engineering_calculus(double data_points[], int count, double step_size
 void calc_linear_regression(double data_points[], int count, int future_predictions);
 
 /**
+ * Compresses an array of numbers using Run-Length Encoding (RLE) and calculates the average from the compressed stream.
+ * @param data_points Array of data points.
+ * @param count Number of data points.
+ */
+void calc_rle_compression(double data_points[], int count);
+
+/**
  * Calculates the weighted average.
  * @param values Array of values.
  * @param weights Array of weights corresponding to the values.

@@ -17,10 +17,12 @@ This tool goes far beyond simple addition and division—it is a comprehensive, 
 
 ## 🌟 Comprehensive Feature List
 
-Calc-Avg has evolved through to **Version 2.9** to include a massive suite of capabilities:
+Calc-Avg has evolved through to **Version 2.10** to include a massive suite of capabilities:
 
 ### 1. Advanced Statistical & Mathematical Engine
 
+- **Cybersecurity Cryptography (SHA-256)**: Military-grade security! After calculating a mathematical average, the C engine processes the memory via a pure C implementation of SHA-256 to generate an irreversible, 64-character cryptographic hash signature ensuring absolute data integrity!
+- **Big Data Compression (RLE)**: Optimize your memory footprint! The engine utilizes Run-Length Encoding to mathematically compress massive repetitive data arrays down to the raw byte level, and dynamically calculates the average from the compressed stream!
 - **Predictive Artificial Intelligence (Machine Learning)**: The C engine can now predict the future! Input an array of historical data points, and the algorithm will calculate the Linear Regression to construct a Line of Best Fit (`y = mx + b`), generating exact predictive mathematical outputs for future periods!
 - **True Graphical User Interface (GUI)**: The ultimate final boss of C programming! Bypassing the terminal entirely, Calc-Avg can now summon a true native Windows Desktop Application using the Win32 API (`<windows.h>`). Complete with physical Textboxes, Buttons, and Labels to calculate averages visually with a mouse!
 - **Engineering Calculus**: High-level Physics mathematics! Input an array of data points and a step interval to instantly calculate the **Numerical Integral** (total area under the curve) using the Trapezoidal Rule, and the **Derivative** (rate of change) using the Central Difference Theorem!

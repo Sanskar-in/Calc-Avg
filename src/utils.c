@@ -53,8 +53,10 @@ void display_menu() {
     printf(COLOR_YELLOW "27. Engineering Calculus (Derivatives & Integrals)\n" COLOR_RESET);
     printf(COLOR_YELLOW "28. Launch Graphical User Interface (GUI)\n" COLOR_RESET);
     printf(COLOR_YELLOW "29. Machine Learning (Linear Regression Predictions)\n" COLOR_RESET);
-    printf(COLOR_YELLOW "30. See Source Code on GitHub\n" COLOR_RESET);
-    printf(COLOR_RED "31. Exit\n" COLOR_RESET);
+    printf(COLOR_YELLOW "30. Cybersecurity Cryptography (SHA-256 Hashing)\n" COLOR_RESET);
+    printf(COLOR_YELLOW "31. Big Data Compression (Run-Length Encoding)\n" COLOR_RESET);
+    printf(COLOR_YELLOW "32. See Source Code on GitHub\n" COLOR_RESET);
+    printf(COLOR_RED "33. Exit\n" COLOR_RESET);
     printf(COLOR_CYAN COLOR_BOLD "=========================================\n" COLOR_RESET);
     printf(COLOR_GREEN "Enter your choice: " COLOR_RESET);
 }

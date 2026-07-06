@@ -815,3 +815,52 @@ void calc_linear_regression(double data_points[], int count, int future_predicti
     }
     printf("\n");
 }
+
+void calc_rle_compression(double data_points[], int count) {
+    if (count == 0) {
+        printf(COLOR_RED "Error: No data to compress.\n" COLOR_RESET);
+        return;
+    }
+
+    printf("\n" COLOR_CYAN COLOR_BOLD "--- Big Data: Run-Length Encoding (RLE) Compression ---" COLOR_RESET "\n\n");
+    printf(COLOR_YELLOW "Original Data Size: " COLOR_RESET "%d data points (%.0f bytes in memory)\n\n", count, (double)(count * sizeof(double)));
+    
+    printf("Compressed Byte Stream:\n");
+    printf("---------------------------------------------\n");
+    
+    double sum = 0.0;
+    int total_compressed_blocks = 0;
+    
+    for (int i = 0; i < count; i++) {
+        double current_val = data_points[i];
+        int run_length = 1;
+        
+        // Count consecutive identical numbers
+        while (i + 1 < count && data_points[i + 1] == current_val) {
+            run_length++;
+            i++;
+        }
+        
+        // Decompress dynamically to calculate sum
+        sum += (current_val * run_length);
+        total_compressed_blocks++;
+        
+        // Print compressed block
+        printf("[ %dx %.4f ] ", run_length, current_val);
+        if (total_compressed_blocks % 5 == 0) printf("\n");
+    }
+    
+    printf("\n\n---------------------------------------------\n");
+    
+    double compressed_size = (double)(total_compressed_blocks * (sizeof(int) + sizeof(double)));
+    double original_size = (double)(count * sizeof(double));
+    double compression_ratio = (1.0 - (compressed_size / original_size)) * 100.0;
+    
+    if (compression_ratio < 0) compression_ratio = 0.0; // In case of negative compression
+    
+    printf(COLOR_GREEN "Compressed Data Size: " COLOR_RESET "%d blocks (%.0f bytes)\n", total_compressed_blocks, compressed_size);
+    printf(COLOR_YELLOW "Compression Ratio: " COLOR_RESET "Reduced memory footprint by %.2f%%\n\n", compression_ratio);
+    
+    double average = sum / count;
+    printf(COLOR_GREEN "Decompressed Mathematical Average: " COLOR_RESET "%.4f\n", average);
+}

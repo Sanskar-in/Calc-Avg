@@ -6,9 +6,11 @@
 # File Purpose: Makefile to build the project.
 
 CC = gcc
-CFLAGS = -Wall -Wextra -Iinclude
-LDFLAGS = -lm -lgdi32
-SRC = src/main.c src/average.c src/utils.c src/gui.c
+CFLAGS = -Wall -Wextra -Iinclude -Ithird_party/sqlite
+LDFLAGS = -lm -lws2_32 -lgdi32
+SRC = src/main.c src/utils.c src/average.c src/gui.c src/crypto.c third_party/sqlite/sqlite3.c
+OBJ = $(SRC:.c=.o)
+EXEC = calc_avg
 
 all: calc_avg
 
