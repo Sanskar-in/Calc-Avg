@@ -147,7 +147,7 @@ Calc-Avg/
 
 ## 🌍 Follow Sanskar (Creator)
 
-This open-source project is proudly created and maintained by **Sanskar**. You can read the full creator documentation in [docs/Follow-Sanskar/follow_sanskar.md](file:///e:/Easy Projects/Avg-c_lang/docs/Follow-Sanskar/follow_sanskar.md) or use the links below:
+This open-source project is proudly created and maintained by **Sanskar**. You can read the full creator documentation in [docs/Follow-Sanskar/follow_sanskar.md](https://github.com/Sanskar-in/Calc-Avg/blob/main/docs/Follow-Sanskar/follow_sanskar.md) or use the links below:
 
 - **GitHub**: [https://www.github.com/Sanskar-in](https://www.github.com/Sanskar-in)
 - **YouTube**: [https://youtube.com/@Sanskar-in](https://youtube.com/@Sanskar-in)
@@ -161,7 +161,7 @@ This open-source project is proudly created and maintained by **Sanskar**. You c
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](file:///e:/Easy Projects/Avg-c_lang/LICENSE) file for details. This means you are free to use, modify, and distribute this software however you like, as long as you provide attribution back to Sanskar.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/Sanskar-in/Calc-Avg/blob/main/LICENSE) file for details. This means you are free to use, modify, and distribute this software however you like, as long as you provide attribution back to Sanskar.
 
 ---
 
