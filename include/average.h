@@ -167,6 +167,14 @@ double calc_avg_matrix(int rows, int cols, double **matrix);
 void calc_financial_moving_averages(double prices[], int count, int window_size);
 
 /**
+ * Calculates the Numerical Integral and Derivative (Engineering Calculus).
+ * @param data_points Array of data points.
+ * @param count Number of data points.
+ * @param step_size The step interval between data points (e.g. 1.0 seconds).
+ */
+void calc_engineering_calculus(double data_points[], int count, double step_size);
+
+/**
  * Calculates the weighted average.
  * @param values Array of values.
  * @param weights Array of weights corresponding to the values.

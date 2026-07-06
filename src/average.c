@@ -717,3 +717,43 @@ void calc_financial_moving_averages(double prices[], int count, int window_size)
     }
     printf("\n");
 }
+
+void calc_engineering_calculus(double data_points[], int count, double step_size) {
+    if (count < 2 || step_size <= 0) {
+        printf(COLOR_RED "Calculus operations require at least 2 data points and a positive step size.\n" COLOR_RESET);
+        return;
+    }
+    
+    // Calculate Numerical Integral (Trapezoidal Rule)
+    double integral = 0.0;
+    for (int i = 0; i < count - 1; i++) {
+        integral += (data_points[i] + data_points[i+1]) / 2.0;
+    }
+    integral *= step_size;
+    
+    printf("\n" COLOR_CYAN COLOR_BOLD "--- Engineering Calculus (Numerical Integrals & Derivatives) ---" COLOR_RESET "\n\n");
+    printf(COLOR_GREEN "Total Integral (Accumulated Area): " COLOR_RESET "%10.4f\n\n", integral);
+    
+    printf(" Point |   Value    | Derivative (Rate of Change)\n");
+    printf("---------------------------------------------------\n");
+    
+    // Calculate Derivatives
+    for (int i = 0; i < count; i++) {
+        double derivative = 0.0;
+        
+        if (i == 0) {
+            // Forward Difference for the first point
+            derivative = (data_points[1] - data_points[0]) / step_size;
+        } else if (i == count - 1) {
+            // Backward Difference for the last point
+            derivative = (data_points[count-1] - data_points[count-2]) / step_size;
+        } else {
+            // Central Difference for internal points
+            derivative = (data_points[i+1] - data_points[i-1]) / (2.0 * step_size);
+        }
+        
+        printf("%6d | %10.4f | ", i + 1, data_points[i]);
+        printf(COLOR_YELLOW "%12.4f" COLOR_RESET "\n", derivative);
+    }
+    printf("\n");
+}

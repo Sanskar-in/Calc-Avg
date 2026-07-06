@@ -595,7 +595,33 @@ int main(int argc, char *argv[]) {
                 free(prices);
                 break;
             }
-            case 27:
+            case 27: {
+                int count;
+                double step_size;
+                printf("Enter the total number of data points to analyze: ");
+                count = read_integer();
+                if (count < 2) {
+                    printf(COLOR_RED "Calculus operations require at least 2 data points.\n" COLOR_RESET);
+                    break;
+                }
+                
+                double *data_points = (double *)malloc(count * sizeof(double));
+                if (!data_points) break;
+                
+                for (int i = 0; i < count; i++) {
+                    printf("Enter Data Point %d: ", i + 1);
+                    data_points[i] = read_double();
+                }
+                
+                printf("Enter the Step Size between points (e.g. 1.0): ");
+                step_size = read_double();
+                
+                calc_engineering_calculus(data_points, count, step_size);
+                
+                free(data_points);
+                break;
+            }
+            case 28:
                 printf(COLOR_CYAN "\nRedirecting to GitHub: https://www.github.com/Sanskar-in/Calc-Avg\n" COLOR_RESET);
 #if defined(_WIN32)
                 system("start https://www.github.com/Sanskar-in/Calc-Avg");
@@ -605,11 +631,11 @@ int main(int argc, char *argv[]) {
                 system("xdg-open https://www.github.com/Sanskar-in/Calc-Avg");
 #endif
                 break;
-            case 28:
+            case 29:
                 printf(COLOR_CYAN COLOR_BOLD "\nExiting Calc-Avg. Thank you for using this open-source project by Sanskar!\n" COLOR_RESET);
                 return 0;
             default:
-                printf(COLOR_RED "Invalid choice. Please select an option between 1 and 28.\n" COLOR_RESET);
+                printf(COLOR_RED "Invalid choice. Please select an option between 1 and 29.\n" COLOR_RESET);
                 break;
         }
     }

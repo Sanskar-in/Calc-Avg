@@ -17,10 +17,11 @@ This tool goes far beyond simple addition and division—it is a comprehensive, 
 
 ## 🌟 Comprehensive Feature List
 
-Calc-Avg has evolved through to **Version 2.6** to include a massive suite of capabilities:
+Calc-Avg has evolved through to **Version 2.7** to include a massive suite of capabilities:
 
 ### 1. Advanced Statistical & Mathematical Engine
 
+- **Engineering Calculus**: High-level Physics mathematics! Input an array of data points and a step interval to instantly calculate the **Numerical Integral** (total area under the curve) using the Trapezoidal Rule, and the **Derivative** (rate of change) using the Central Difference Theorem!
 - **Financial Market Analysis**: Quantitative Wall-Street algorithms implemented! Input historical stock prices and calculate the **Simple Moving Average (SMA)** and the dynamically weighted **Exponential Moving Average (EMA)** to map market momentum in a beautiful ASCII table!
 - **2D Matrix Mathematics**: Map an entire X/Y grid! The engine will construct a beautiful ASCII matrix and simultaneously calculate the independent average of every single Row, every single Column, and the Total overall Matrix.
 - **Dynamic Average**: Enter any arbitrary amount of numbers on the fly to calculate their mean.
