@@ -1,0 +1,7 @@
+# Ignore the HTML/CSS/JS frontend files from GitHub's language statistics
+# This forces GitHub to recognize the project purely as a C repository.
+web-app/* linguist-vendored
+versions/** linguist-vendored
+
+# Ensure third-party vendored C files (like SQLite) are counted as C if desired
+# third_party/** linguist-vendored=false 
