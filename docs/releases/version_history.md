@@ -20,7 +20,13 @@ This document chronicles the legendary evolution of the **Calc-Avg** project, hi
 
 ---
 
-## 🚀 Version 3.3: The Remote Desktop Expansion (LATEST)
+## 🚀 Version 3.4: The Brand Expansion (LATEST)
+**Status:** Released
+- **Native `.ICO` App Icon**: Embedded a custom, AI-designed high-tech neon logo directly into the Windows `calc_avg.exe` binary via the Resource Compiler (`MAINICON`).
+- **Web Server Routing**: Upgraded the `server.c` HTTP router to safely parse and transmit `image/png` MIME types for static assets.
+- **Favicon & Dashboard UI**: The glowing logo is now securely served as the browser's Favicon and prominently featured in the newly overhauled Glassmorphism header via HTML Flexbox.
+
+## 🌟 Version 3.3: The Remote Desktop Expansion
 **Status:** Released
 - **Windows GDI Screen Capture**: Utilizing `GetDC()` and `StretchBlt()`, the C Engine physically screenshots the user's desktop monitor, scaling it down to a 640x360 24-bit RGB bitmap entirely in RAM natively.
 - **Wincrypt Base64 Encoding**: Encodes the massive binary `.bmp` blob into a single Base64 string instantly using native Windows Cryptography (`CryptBinaryToStringA`).

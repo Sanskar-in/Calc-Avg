@@ -372,7 +372,7 @@ void launch_web_server(void) {
         closesocket(ListenSocket); WSACleanup(); return;
     }
 
-    printf("\n" COLOR_CYAN COLOR_BOLD "--- Web Server: Calc-Avg Version 3.3 Remote Desktop Edition ---" COLOR_RESET "\n");
+    printf("\n" COLOR_CYAN COLOR_BOLD "--- Web Server: Calc-Avg Version 3.4 (The Brand Expansion) ---" COLOR_RESET "\n");
     printf(COLOR_GREEN "Server is LIVE and listening on port %d" COLOR_RESET "\n", PORT);
     printf(COLOR_YELLOW "Open your Web Browser and navigate to: http://localhost:%d\n" COLOR_RESET, PORT);
     printf("Serving Web App from 'web-app/'. API Routes: /api/calculus, /api/crypto, ws://localhost:%d...\n", PORT);
@@ -710,6 +710,9 @@ void launch_web_server(void) {
                 } else if (strcmp(path, "/script.js") == 0) {
                     send_file(ClientSocket, "web-app/script.js", "application/javascript");
                     printf("Served: web-app/script.js\n");
+                } else if (strcmp(path, "/logo.png") == 0) {
+                    send_file(ClientSocket, "web-app/logo.png", "image/png");
+                    printf("Served: web-app/logo.png\n");
                 } else {
                     char err[] = "HTTP/1.1 404 Not Found\r\nConnection: close\r\n\r\nFile Not Found";
                     send(ClientSocket, err, strlen(err), 0);
