@@ -17,10 +17,11 @@ This tool goes far beyond simple addition and division—it is a comprehensive, 
 
 ## 🌟 Comprehensive Feature List
 
-Calc-Avg has evolved through to **Version 3.1** to include a massive suite of capabilities:
+Calc-Avg has evolved through to **Version 3.2** to include a massive suite of capabilities:
 
 ### 1. Advanced Statistical & Mathematical Engine
 
+- **Premium Executable Metadata**: Commercial-grade polish! The `.exe` binary now natively contains Windows PE Header properties compiled via `windres` and `.rc` scripts. Hovering over the file explicitly displays the Company Name (Sanskar), the File Description, Copyrights, and the exact Version Number directly in Windows File Explorer!
 - **JSON REST API & Web Dashboard**: Transform the application into a Web Microservice! The C engine utilizes `winsock2` to host a native HTTP TCP Web Server on Port 8080. It serves a stunning Glassmorphism Web Dashboard featuring interactive forms, dynamic AJAX (Fetch API) requests, and beautiful `Chart.js` Data Visualizations! The C backend computes advanced statistics and returns structured JSON responses.
 - **Data Sonification (Hardware Audio Generation)**: Make your math sing! The engine uses low-level Windows APIs to mathematically map your data array into physical audio frequencies (Hertz). It literally plays your data as musical tones through your speakers, culminating in a grand synthesized note for the final average!
 - **Cybersecurity Cryptography (SHA-256)**: Military-grade security! After calculating a mathematical average, the C engine processes the memory via a pure C implementation of SHA-256 to generate an irreversible, 64-character cryptographic hash signature ensuring absolute data integrity!

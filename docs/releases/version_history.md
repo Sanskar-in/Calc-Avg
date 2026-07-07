@@ -20,7 +20,13 @@ This document chronicles the legendary evolution of the **Calc-Avg** project, hi
 
 ---
 
-## 🌟 Version 3.1: The Web REST API & Dashboard Update (LATEST)
+## 🌟 Version 3.2: The Premium Metadata Update (LATEST)
+**Status:** Released
+- **Windows Portable Executable (PE) Metadata Injection:** Compiled a native C-Resource script (`calc_avg.rc`) containing the official Windows `VERSIONINFO` block.
+- **Embedded Properties:** Hovering over `calc_avg.exe` in Windows natively displays the Company Name (**Sanskar**), File Description, Copyrights, and Version Number (3.2.0.0).
+- **`windres` Build Integration:** Overhauled the GNU/MinGW `Makefile` to seamlessly compile and link the `.rc` resource object into the final binary.
+
+## 🌐 Version 3.1: The Web REST API & Dashboard Update
 **Status:** Released
 - **JSON REST API Microservice (`server.c`):** Transformed the C backend into a modern web API. The `/api/calculate` endpoint dynamically computes advanced statistical calculations (Mean, Median, Mode, Variance, Standard Deviation) and generates structured JSON string responses.
 - **Modern Web Dashboard Frontend (`web/`):** Engineered a stunning frontend interface utilizing modern Glassmorphism aesthetics, animated background orbs, and premium typography. The UI operates asynchronously using modern JavaScript `fetch()` APIs to communicate with the C backend without page reloads.
