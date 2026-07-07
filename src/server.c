@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #ifdef _WIN32
 #include <winsock2.h>
@@ -24,33 +25,54 @@
 #pragma comment(lib, "ws2_32.lib")
 
 #define PORT 8080
-#define BUFFER_SIZE 4096
+#define BUFFER_SIZE 8192
 
-// HTML template with styling and form
-const char* html_page = 
-"HTTP/1.1 200 OK\r\n"
-"Content-Type: text/html\r\n"
-"Connection: close\r\n\r\n"
-"<!DOCTYPE html>"
-"<html><head><title>Calc-Avg Web Portal</title>"
-"<style>"
-"body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; color: #f8fafc; text-align: center; padding: 50px; }"
-"h1 { color: #38bdf8; }"
-"input { padding: 10px; font-size: 16px; border-radius: 5px; border: none; width: 300px; }"
-"button { padding: 10px 20px; font-size: 16px; border-radius: 5px; border: none; background: #38bdf8; color: #0f172a; cursor: pointer; font-weight: bold; margin-left: 10px; }"
-"button:hover { background: #0284c7; }"
-".result { margin-top: 30px; font-size: 24px; color: #4ade80; }"
-"</style>"
-"</head><body>"
-"<h1>Calc-Avg Web Server</h1>"
-"<p>Enter numbers separated by commas to calculate the mathematical average directly through the C Backend.</p>"
-"<form action='/calc' method='GET'>"
-"<input type='text' name='data' placeholder='e.g., 10, 20, 30' required />"
-"<button type='submit'>Calculate Average</button>"
-"</form>"
-"%s" // Placeholder for result
-"</body></html>";
+// Helper function to serve a file from the web directory
+void send_file(SOCKET client, const char* filepath, const char* content_type) {
+    FILE *file = fopen(filepath, "rb");
+    if (!file) {
+        // Fallback for missing file
+        char header[] = "HTTP/1.1 404 Not Found\r\nConnection: close\r\n\r\n404 File Not Found.";
+        send(client, header, strlen(header), 0);
+        return;
+    }
+    
+    // Get file size
+    fseek(file, 0, SEEK_END);
+    long fsize = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    
+    // Read file into buffer
+    char *file_buf = (char *)malloc(fsize + 1);
+    if (!file_buf) {
+        fclose(file);
+        return;
+    }
+    fread(file_buf, 1, fsize, file);
+    fclose(file);
+    
+    // Send HTTP Header
+    char header[256];
+    snprintf(header, sizeof(header), 
+             "HTTP/1.1 200 OK\r\n"
+             "Content-Type: %s\r\n"
+             "Content-Length: %ld\r\n"
+             "Connection: close\r\n\r\n", content_type, fsize);
+    
+    send(client, header, strlen(header), 0);
+    send(client, file_buf, fsize, 0);
+    
+    free(file_buf);
+}
 
+// Helper to sort for median
+static int compare_doubles(const void *a, const void *b) {
+    double da = *(const double*)a;
+    double db = *(const double*)b;
+    return (da > db) - (da < db);
+}
+
+// The main web server loop
 void launch_web_server(void) {
     WSADATA wsaData;
     int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -85,9 +107,10 @@ void launch_web_server(void) {
         return;
     }
 
-    printf("\n" COLOR_CYAN COLOR_BOLD "--- Web Server: Calc-Avg Browser Portal ---" COLOR_RESET "\n");
+    printf("\n" COLOR_CYAN COLOR_BOLD "--- Web Server: Calc-Avg Version 3.1 REST API & Dashboard ---" COLOR_RESET "\n");
     printf(COLOR_GREEN "Server is LIVE and listening on port %d" COLOR_RESET "\n", PORT);
     printf(COLOR_YELLOW "Open your Web Browser and navigate to: http://localhost:%d\n" COLOR_RESET, PORT);
+    printf("Serving files from the 'web/' directory.\n");
     printf("Press Ctrl+C to stop the server and return to the terminal.\n\n");
 
     SOCKET ClientSocket;
@@ -96,7 +119,6 @@ void launch_web_server(void) {
     while (1) {
         ClientSocket = accept(ListenSocket, NULL, NULL);
         if (ClientSocket == INVALID_SOCKET) {
-            printf("Accept failed: %d\n", WSAGetLastError());
             continue;
         }
 
@@ -104,55 +126,138 @@ void launch_web_server(void) {
         if (bytesReceived > 0) {
             buffer[bytesReceived] = '\0';
             
-            // Check if it's a GET request for /calc
-            if (strncmp(buffer, "GET /calc?data=", 15) == 0) {
-                // Extract data
-                char *data_start = buffer + 15;
-                char *data_end = strchr(data_start, ' ');
-                if (data_end) *data_end = '\0';
+            // Extract the requested path
+            char method[16], path[1024];
+            sscanf(buffer, "%15s %1023s", method, path);
+            
+            // API Endpoint: /api/calculate
+            if (strncmp(path, "/api/calculate", 14) == 0) {
+                // Parse Query String
+                char *data_ptr = strstr(path, "data=");
+                char *op_ptr = strstr(path, "op=");
+                
+                if (data_ptr) {
+                    data_ptr += 5; // skip 'data='
+                    char *amp = strchr(data_ptr, '&');
+                    if (amp) *amp = '\0'; // terminate at next param
+                    
+                    int is_all_stats = (op_ptr && strncmp(op_ptr + 3, "all", 3) == 0);
+                    
+                    // Decode URL entities (%2C for comma, + for space)
+                    char decoded[2048] = {0};
+                    int j = 0;
+                    for (int i = 0; data_ptr[i] != '\0' && j < 2047; i++, j++) {
+                        if (data_ptr[i] == '%' && data_ptr[i+1] == '2' && (data_ptr[i+2] == 'C' || data_ptr[i+2] == 'c')) {
+                            decoded[j] = ','; i += 2;
+                        } else if (data_ptr[i] == '+') {
+                            decoded[j] = ' ';
+                        } else {
+                            decoded[j] = data_ptr[i];
+                        }
+                    }
 
-                // Decode URL entities (e.g. %2C for comma)
-                char decoded[1024] = {0};
-                int j = 0;
-                for (int i = 0; data_start[i] != '\0' && j < 1023; i++, j++) {
-                    if (data_start[i] == '%' && data_start[i+1] == '2' && (data_start[i+2] == 'C' || data_start[i+2] == 'c')) {
-                        decoded[j] = ',';
-                        i += 2;
-                    } else if (data_start[i] == '+') {
-                        decoded[j] = ' ';
+                    // Parse numbers
+                    double numbers[1000];
+                    int count = 0;
+                    double sum = 0;
+                    
+                    char *token = strtok(decoded, ", ");
+                    while (token != NULL && count < 1000) {
+                        numbers[count] = atof(token);
+                        sum += numbers[count];
+                        count++;
+                        token = strtok(NULL, ", ");
+                    }
+                    
+                    if (count > 0) {
+                        double mean = sum / count;
+                        
+                        // Construct JSON Response
+                        char json_resp[4096];
+                        char data_array_str[2048] = "[";
+                        
+                        // Build original_data JSON array
+                        for(int i = 0; i < count; i++) {
+                            char temp[32];
+                            snprintf(temp, sizeof(temp), "%.4f%s", numbers[i], (i == count-1) ? "" : ",");
+                            strcat(data_array_str, temp);
+                        }
+                        strcat(data_array_str, "]");
+                        
+                        if (is_all_stats) {
+                            // Calculate Median
+                            double sorted[1000];
+                            for(int i=0; i<count; i++) sorted[i] = numbers[i];
+                            qsort(sorted, count, sizeof(double), compare_doubles);
+                            double median = (count % 2 == 0) ? (sorted[count/2 - 1] + sorted[count/2]) / 2.0 : sorted[count/2];
+                            
+                            // Calculate Mode (simplified)
+                            double mode = sorted[0];
+                            int max_count = 1, current_count = 1;
+                            for (int i = 1; i < count; i++) {
+                                if (sorted[i] == sorted[i-1]) {
+                                    current_count++;
+                                } else {
+                                    if (current_count > max_count) {
+                                        max_count = current_count;
+                                        mode = sorted[i-1];
+                                    }
+                                    current_count = 1;
+                                }
+                            }
+                            if (current_count > max_count) mode = sorted[count-1];
+                            
+                            // Calculate Variance and Std Dev (Population)
+                            double var_sum = 0;
+                            for(int i=0; i<count; i++) {
+                                var_sum += pow(numbers[i] - mean, 2);
+                            }
+                            double variance = var_sum / count;
+                            double std_dev = sqrt(variance);
+                            
+                            snprintf(json_resp, sizeof(json_resp),
+                                "{\"count\":%d, \"sum\":%.4f, \"mean\":%.4f, \"median\":%.4f, \"mode\":%.4f, \"variance\":%.4f, \"std_dev\":%.4f, \"original_data\":%s}",
+                                count, sum, mean, median, mode, variance, std_dev, data_array_str);
+                                
+                            printf("API Request: Computed Comprehensive Stats for %d items.\n", count);
+                        } else {
+                            snprintf(json_resp, sizeof(json_resp),
+                                "{\"count\":%d, \"sum\":%.4f, \"mean\":%.4f, \"original_data\":%s}",
+                                count, sum, mean, data_array_str);
+                                
+                            printf("API Request: Computed Mean for %d items.\n", count);
+                        }
+                        
+                        char header[256];
+                        snprintf(header, sizeof(header),
+                                 "HTTP/1.1 200 OK\r\n"
+                                 "Content-Type: application/json\r\n"
+                                 "Connection: close\r\n\r\n");
+                                 
+                        send(ClientSocket, header, strlen(header), 0);
+                        send(ClientSocket, json_resp, strlen(json_resp), 0);
                     } else {
-                        decoded[j] = data_start[i];
+                        char err[] = "HTTP/1.1 400 Bad Request\r\nConnection: close\r\n\r\n{\"error\":\"No valid numbers provided\"}";
+                        send(ClientSocket, err, strlen(err), 0);
                     }
                 }
-
-                // Parse commas and calculate average
-                double sum = 0;
-                int count = 0;
-                char *token = strtok(decoded, ", ");
-                while (token != NULL) {
-                    sum += atof(token);
-                    count++;
-                    token = strtok(NULL, ", ");
-                }
-
-                char result_html[512];
-                if (count > 0) {
-                    double average = sum / count;
-                    snprintf(result_html, sizeof(result_html), "<div class='result'>Mathematical Average: <strong>%.4f</strong> (from %d numbers)</div>", average, count);
-                    printf("Web Request Processed: Calculated Average %.4f for %d numbers.\n", average, count);
+            } 
+            // Static File Serving Route
+            else {
+                if (strcmp(path, "/") == 0) {
+                    // Serve index.html from web folder
+                    send_file(ClientSocket, "web/index.html", "text/html");
+                    printf("Served: web/index.html\n");
+                } else if (strcmp(path, "/style.css") == 0) {
+                    send_file(ClientSocket, "web/style.css", "text/css");
+                    printf("Served: web/style.css\n");
+                } else if (strcmp(path, "/app.js") == 0) {
+                    send_file(ClientSocket, "web/app.js", "application/javascript");
+                    printf("Served: web/app.js\n");
                 } else {
-                    snprintf(result_html, sizeof(result_html), "<div class='result' style='color:#ef4444;'>Error: No valid numbers found.</div>");
+                    char err[] = "HTTP/1.1 404 Not Found\r\nConnection: close\r\n\r\nFile Not Found";
+                    send(ClientSocket, err, strlen(err), 0);
                 }
-
-                char response[BUFFER_SIZE];
-                snprintf(response, sizeof(response), html_page, result_html);
-                send(ClientSocket, response, (int)strlen(response), 0);
-
-            } else {
-                // Serve root page
-                char response[BUFFER_SIZE];
-                snprintf(response, sizeof(response), html_page, "");
-                send(ClientSocket, response, (int)strlen(response), 0);
             }
         }
         closesocket(ClientSocket);

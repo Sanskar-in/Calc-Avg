@@ -20,7 +20,13 @@ This document chronicles the legendary evolution of the **Calc-Avg** project, hi
 
 ---
 
-## 🌟 Version 3.0: The Web Server & Sonification Update (LATEST)
+## 🌟 Version 3.1: The Web REST API & Dashboard Update (LATEST)
+**Status:** Released
+- **JSON REST API Microservice (`server.c`):** Transformed the C backend into a modern web API. The `/api/calculate` endpoint dynamically computes advanced statistical calculations (Mean, Median, Mode, Variance, Standard Deviation) and generates structured JSON string responses.
+- **Modern Web Dashboard Frontend (`web/`):** Engineered a stunning frontend interface utilizing modern Glassmorphism aesthetics, animated background orbs, and premium typography. The UI operates asynchronously using modern JavaScript `fetch()` APIs to communicate with the C backend without page reloads.
+- **Chart.js Integration (`app.js`):** The web dashboard automatically draws beautiful, animated Bar Charts mapping out the numerical data arrays natively inside the browser!
+
+## 🌐 Version 3.0: The Web Server & Sonification Update
 **Status:** Released
 - **Native HTTP Web Server (`server.c`):** Embedded a native TCP HTTP socket server using `<winsock2.h>`. The application can now host a beautiful HTML/CSS frontend on `localhost:8080`, intercept browser HTTP `GET` requests, dynamically calculate the average, and serve the results natively.
 - **Hardware Data Sonification (`audio.c`):** Embedded the low-level Windows kernel API `Beep()`. The engine now maps massive numerical data arrays into physical audio frequencies (Hertz), physically playing the data graph as a synthesized musical tone sequence through the computer hardware.
