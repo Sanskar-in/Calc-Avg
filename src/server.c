@@ -105,28 +105,136 @@ double get_ram_usage() {
     return (double)physMemUsed / (double)totalPhysMem * 100.0;
 }
 
+// --- Live Remote Desktop Screen Capture ---
+#pragma pack(push, 1)
+typedef struct {
+    BITMAPFILEHEADER bfh;
+    BITMAPINFOHEADER bih;
+} BMPHEADER;
+#pragma pack(pop)
+
+char* capture_screen_base64() {
+    HDC hScreenDC = GetDC(NULL);
+    HDC hMemoryDC = CreateCompatibleDC(hScreenDC);
+    int width = GetDeviceCaps(hScreenDC, HORZRES);
+    int height = GetDeviceCaps(hScreenDC, VERTRES);
+    
+    // Scale down to maintain high framerate (640x360)
+    int target_width = 640;
+    int target_height = 360;
+
+    HBITMAP hBitmap = CreateCompatibleBitmap(hScreenDC, target_width, target_height);
+    HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemoryDC, hBitmap);
+    
+    // Capture and scale
+    SetStretchBltMode(hMemoryDC, COLORONCOLOR);
+    StretchBlt(hMemoryDC, 0, 0, target_width, target_height, hScreenDC, 0, 0, width, height, SRCCOPY);
+    
+    int row_padded = (target_width * 3 + 3) & (~3);
+    int dataSize = row_padded * target_height;
+    
+    BYTE* pixels = (BYTE*)malloc(dataSize);
+    
+    BITMAPINFOHEADER bi = {0};
+    bi.biSize = sizeof(BITMAPINFOHEADER);
+    bi.biWidth = target_width;
+    bi.biHeight = target_height; // Bottom-up
+    bi.biPlanes = 1;
+    bi.biBitCount = 24;
+    bi.biCompression = BI_RGB;
+    
+    GetDIBits(hMemoryDC, hBitmap, 0, target_height, pixels, (BITMAPINFO*)&bi, DIB_RGB_COLORS);
+    
+    BMPHEADER header;
+    memset(&header, 0, sizeof(header));
+    header.bfh.bfType = 0x4D42; // "BM"
+    header.bfh.bfSize = sizeof(BMPHEADER) + dataSize;
+    header.bfh.bfOffBits = sizeof(BMPHEADER);
+    header.bih = bi;
+    
+    // Combine header and pixels
+    BYTE* bmpBlob = (BYTE*)malloc(header.bfh.bfSize);
+    memcpy(bmpBlob, &header, sizeof(BMPHEADER));
+    memcpy(bmpBlob + sizeof(BMPHEADER), pixels, dataSize);
+    
+    // Base64 encode
+    DWORD b64Len = 0;
+    CryptBinaryToStringA(bmpBlob, header.bfh.bfSize, CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, NULL, &b64Len);
+    char* b64Str = (char*)malloc(b64Len + 1);
+    CryptBinaryToStringA(bmpBlob, header.bfh.bfSize, CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, b64Str, &b64Len);
+    
+    // Cleanup
+    free(pixels);
+    free(bmpBlob);
+    SelectObject(hMemoryDC, hOldBitmap);
+    DeleteObject(hBitmap);
+    DeleteDC(hMemoryDC);
+    ReleaseDC(NULL, hScreenDC);
+    
+    return b64Str;
+}
+
 DWORD WINAPI websocket_stream_thread(LPVOID arg) {
     SOCKET ws_socket = (SOCKET)arg;
     double x = 0.0;
     while (1) {
-        Sleep(100); // 10Hz Update to allow CPU delta to accumulate
+        Sleep(200); // 5Hz Update to accommodate massive screen payloads
         
         double cpu = get_cpu_usage();
         double ram = get_ram_usage();
+        char* b64Str = capture_screen_base64();
         
-        char json_payload[128];
-        snprintf(json_payload, sizeof(json_payload), "{\"cpu\":%.2f, \"ram\":%.2f}", cpu, ram);
+        if (!b64Str) continue;
         
-        int payload_len = strlen(json_payload);
-        BYTE frame[256];
+        // Build JSON payload dynamically
+        ULONGLONG payload_alloc = 128 + strlen(b64Str);
+        char* json_payload = (char*)malloc(payload_alloc);
+        snprintf(json_payload, payload_alloc, "{\"cpu\":%.2f, \"ram\":%.2f, \"screen\":\"data:image/bmp;base64,%s\"}", cpu, ram, b64Str);
         
-        frame[0] = 0x81; // FIN + Text Frame
-        frame[1] = payload_len; // Unmasked (Server -> Client)
+        ULONGLONG payload_len = strlen(json_payload);
         
-        memcpy(frame + 2, json_payload, payload_len);
+        ULONGLONG to_send = 10 + payload_len;
+        BYTE* frame = (BYTE*)malloc(to_send);
         
-        int bytesSent = send(ws_socket, (char*)frame, 2 + payload_len, 0);
-        if (bytesSent <= 0) break; // Client disconnected
+        frame[0] = 0x81; // FIN + Text
+        int header_len = 0;
+        
+        if (payload_len <= 125) {
+            frame[1] = (BYTE)payload_len;
+            header_len = 2;
+        } else if (payload_len <= 65535) {
+            frame[1] = 126;
+            frame[2] = (payload_len >> 8) & 0xFF;
+            frame[3] = payload_len & 0xFF;
+            header_len = 4;
+        } else {
+            frame[1] = 127;
+            frame[2] = (payload_len >> 56) & 0xFF;
+            frame[3] = (payload_len >> 48) & 0xFF;
+            frame[4] = (payload_len >> 40) & 0xFF;
+            frame[5] = (payload_len >> 32) & 0xFF;
+            frame[6] = (payload_len >> 24) & 0xFF;
+            frame[7] = (payload_len >> 16) & 0xFF;
+            frame[8] = (payload_len >> 8) & 0xFF;
+            frame[9] = payload_len & 0xFF;
+            header_len = 10;
+        }
+        
+        memcpy(frame + header_len, json_payload, payload_len);
+        
+        int total_sent = 0;
+        int frame_total_len = header_len + payload_len;
+        while(total_sent < frame_total_len) {
+            int s = send(ws_socket, (char*)frame + total_sent, frame_total_len - total_sent, 0);
+            if(s <= 0) break;
+            total_sent += s;
+        }
+        
+        free(frame);
+        free(json_payload);
+        free(b64Str);
+        
+        if (total_sent < frame_total_len) break; // Disconnected
     }
     closesocket(ws_socket);
     return 0;
@@ -264,7 +372,7 @@ void launch_web_server(void) {
         closesocket(ListenSocket); WSACleanup(); return;
     }
 
-    printf("\n" COLOR_CYAN COLOR_BOLD "--- Web Server: Calc-Avg Version 4.4 Live System Monitor ---" COLOR_RESET "\n");
+    printf("\n" COLOR_CYAN COLOR_BOLD "--- Web Server: Calc-Avg Version 3.3 Remote Desktop Edition ---" COLOR_RESET "\n");
     printf(COLOR_GREEN "Server is LIVE and listening on port %d" COLOR_RESET "\n", PORT);
     printf(COLOR_YELLOW "Open your Web Browser and navigate to: http://localhost:%d\n" COLOR_RESET, PORT);
     printf("Serving Web App from 'web-app/'. API Routes: /api/calculus, /api/crypto, ws://localhost:%d...\n", PORT);
@@ -311,7 +419,7 @@ void launch_web_server(void) {
                     
                     // Spawn stream thread
                     CreateThread(NULL, 0, websocket_stream_thread, (LPVOID)ClientSocket, 0, NULL);
-                    printf("API Request: Upgraded to WebSocket. Spawning 10Hz System Monitor stream thread!\n");
+                    printf("API Request: Upgraded to WebSocket. Spawning massive 5Hz Remote Desktop stream thread!\n");
                     continue; // Skip closesocket
                 }
             }

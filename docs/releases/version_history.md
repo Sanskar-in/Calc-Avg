@@ -20,7 +20,14 @@ This document chronicles the legendary evolution of the **Calc-Avg** project, hi
 
 ---
 
-## 🚀 Version 4.4: The Live System Monitor Expansion (LATEST)
+## 🚀 Version 3.3: The Remote Desktop Expansion (LATEST)
+**Status:** Released
+- **Windows GDI Screen Capture**: Utilizing `GetDC()` and `StretchBlt()`, the C Engine physically screenshots the user's desktop monitor, scaling it down to a 640x360 24-bit RGB bitmap entirely in RAM natively.
+- **Wincrypt Base64 Encoding**: Encodes the massive binary `.bmp` blob into a single Base64 string instantly using native Windows Cryptography (`CryptBinaryToStringA`).
+- **64-Bit Extended WebSockets**: Upgraded the `websocket_stream_thread` framer (Opcode 127) to calculate and construct 64-bit Payload Length headers, enabling the engine to effortlessly blast megabytes of JSON data over the TCP socket.
+- **Live Stream Viewer**: The Web Dashboard renders the massive JSON payload (`{"cpu": %, "ram": %, "screen": "data:image/bmp;base64,..."}`) directly onto the HTML canvas, transforming the browser into a fully functional 5Hz Remote Desktop!
+
+## 🌟 Version 4.4: The Live System Monitor Expansion
 **Status:** Released
 - **Windows Kernel Hardware APIs (`<windows.h>`)**: Engineered `get_cpu_usage()` and `get_ram_usage()` utilizing raw `GetSystemTimes()` and `GlobalMemoryStatusEx()` to extract the physical hardware metrics from the operating system natively in C.
 - **WebSocket Streaming Redesign**: Upgraded the `websocket_stream_thread` to blast the hardware JSON payloads (`{"cpu": %, "ram": %}`) at 10 Frames Per Second over the `ws://` TCP socket.
