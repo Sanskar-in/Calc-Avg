@@ -14,6 +14,7 @@
 
 #include "../include/server.h"
 #include "../include/utils.h"
+#include "../include/crypto.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -112,6 +113,28 @@ void parse_numbers(const char* decoded, double* numbers, int* count, double* sum
     }
 }
 
+// Custom RLE algorithm from average.c
+void api_compress_data(const double* numbers, int count, char* compressed_hex, int* original_bytes, int* compressed_bytes) {
+    *original_bytes = count * sizeof(double);
+    *compressed_bytes = 0;
+    compressed_hex[0] = '\0';
+    
+    if (count == 0) return;
+    
+    int i = 0;
+    char hex_part[32];
+    while (i < count) {
+        int run = 1;
+        while (i + run < count && numbers[i] == numbers[i + run]) {
+            run++;
+        }
+        *compressed_bytes += sizeof(int) + sizeof(double);
+        snprintf(hex_part, sizeof(hex_part), "%dx%.2f ", run, numbers[i]);
+        strcat(compressed_hex, hex_part);
+        i += run;
+    }
+}
+
 // The main web server loop
 void launch_web_server(void) {
     WSADATA wsaData;
@@ -134,10 +157,10 @@ void launch_web_server(void) {
         closesocket(ListenSocket); WSACleanup(); return;
     }
 
-    printf("\n" COLOR_CYAN COLOR_BOLD "--- Web Server: Calc-Avg Version 4.1 Unified API ---" COLOR_RESET "\n");
+    printf("\n" COLOR_CYAN COLOR_BOLD "--- Web Server: Calc-Avg Version 4.2 API Expansion ---" COLOR_RESET "\n");
     printf(COLOR_GREEN "Server is LIVE and listening on port %d" COLOR_RESET "\n", PORT);
     printf(COLOR_YELLOW "Open your Web Browser and navigate to: http://localhost:%d\n" COLOR_RESET, PORT);
-    printf("Serving Unified Web App from the 'web-app/' directory.\n");
+    printf("Serving Web App from 'web-app/'. API Routes: /api/calculus, /api/crypto, /api/compress...\n");
     printf("Press Ctrl+C to stop the server and return to the terminal.\n\n");
 
     SOCKET ClientSocket;
@@ -308,6 +331,124 @@ void launch_web_server(void) {
                     send(ClientSocket, json_resp, strlen(json_resp), 0);
                 } else {
                     char err[] = "HTTP/1.1 400 Bad Request\r\nConnection: close\r\n\r\n{\"error\":\"Insufficient data\"}";
+                    send(ClientSocket, err, strlen(err), 0);
+                }
+            }
+            // API Endpoint: /api/calculus (Integration & Differentiation)
+            else if (strncmp(path, "/api/calculus", 13) == 0) {
+                char data_param[2048], step_param[16];
+                parse_query_param(path, "data", data_param, sizeof(data_param));
+                parse_query_param(path, "step", step_param, sizeof(step_param));
+                
+                double step = atof(step_param);
+                if (step <= 0) step = 1.0;
+                
+                char decoded[2048] = {0};
+                decode_url(decoded, data_param);
+                
+                double points[1000];
+                int count = 0; double sum_ignore = 0;
+                parse_numbers(decoded, points, &count, &sum_ignore);
+                
+                if (count >= 2) {
+                    double integral = 0;
+                    for (int i = 0; i < count - 1; i++) {
+                        integral += ((points[i] + points[i + 1]) / 2.0) * step;
+                    }
+                    
+                    char deriv_array_str[4096] = "[null,";
+                    for (int i = 1; i < count - 1; i++) {
+                        double deriv = (points[i + 1] - points[i - 1]) / (2.0 * step);
+                        char temp[32]; snprintf(temp, sizeof(temp), "%.4f,", deriv);
+                        strcat(deriv_array_str, temp);
+                    }
+                    strcat(deriv_array_str, "null]");
+                    
+                    char orig_array_str[2048] = "[";
+                    for(int i = 0; i < count; i++) {
+                        char temp[32]; snprintf(temp, sizeof(temp), "%.4f%s", points[i], (i == count-1) ? "" : ",");
+                        strcat(orig_array_str, temp);
+                    }
+                    strcat(orig_array_str, "]");
+                    
+                    char json_resp[8192];
+                    snprintf(json_resp, sizeof(json_resp),
+                        "{\"count\":%d, \"step\":%.4f, \"integral\":%.4f, \"original_data\":%s, \"derivatives\":%s}",
+                        count, step, integral, orig_array_str, deriv_array_str);
+                        
+                    printf("API Request: Computed Calculus for %d points.\n", count);
+                    
+                    char header[] = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n";
+                    send(ClientSocket, header, strlen(header), 0);
+                    send(ClientSocket, json_resp, strlen(json_resp), 0);
+                } else {
+                    char err[] = "HTTP/1.1 400 Bad Request\r\nConnection: close\r\n\r\n{\"error\":\"Need at least 2 points for Calculus\"}";
+                    send(ClientSocket, err, strlen(err), 0);
+                }
+            }
+            // API Endpoint: /api/crypto (SHA-256)
+            else if (strncmp(path, "/api/crypto", 11) == 0) {
+                char data_param[2048];
+                parse_query_param(path, "data", data_param, sizeof(data_param));
+                
+                char decoded[2048] = {0};
+                decode_url(decoded, data_param);
+                
+                // Using the C Engine's native SHA256 logic on the decoded string!
+                SHA256_CTX ctx;
+                sha256_init(&ctx);
+                sha256_update(&ctx, (const uint8_t*)decoded, strlen(decoded));
+                uint8_t hash_bytes[32];
+                sha256_final(&ctx, hash_bytes);
+                
+                char hash_hex[65];
+                for (int i = 0; i < 32; i++) {
+                    sprintf(hash_hex + (i * 2), "%02x", hash_bytes[i]);
+                }
+                hash_hex[64] = '\0';
+                
+                char json_resp[1024];
+                snprintf(json_resp, sizeof(json_resp),
+                    "{\"data\":\"%s\", \"hash\":\"%s\"}",
+                    decoded, hash_hex);
+                    
+                printf("API Request: Computed Crypto Hash (SHA-256).\n");
+                
+                char header[] = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n";
+                send(ClientSocket, header, strlen(header), 0);
+                send(ClientSocket, json_resp, strlen(json_resp), 0);
+            }
+            // API Endpoint: /api/compress (RLE)
+            else if (strncmp(path, "/api/compress", 13) == 0) {
+                char data_param[2048];
+                parse_query_param(path, "data", data_param, sizeof(data_param));
+                
+                char decoded[2048] = {0};
+                decode_url(decoded, data_param);
+                
+                double numbers[1000];
+                int count = 0; double sum_ignore = 0;
+                parse_numbers(decoded, numbers, &count, &sum_ignore);
+                
+                if (count > 0) {
+                    char compressed_hex[4096];
+                    int orig_bytes = 0, comp_bytes = 0;
+                    api_compress_data(numbers, count, compressed_hex, &orig_bytes, &comp_bytes);
+                    
+                    double ratio = 100.0 * (1.0 - ((double)comp_bytes / (double)orig_bytes));
+                    
+                    char json_resp[8192];
+                    snprintf(json_resp, sizeof(json_resp),
+                        "{\"original_bytes\":%d, \"compressed_bytes\":%d, \"compression_ratio\":%.2f, \"compressed_stream\":\"%s\"}",
+                        orig_bytes, comp_bytes, ratio, compressed_hex);
+                        
+                    printf("API Request: Compressed Big Data Array.\n");
+                    
+                    char header[] = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n";
+                    send(ClientSocket, header, strlen(header), 0);
+                    send(ClientSocket, json_resp, strlen(json_resp), 0);
+                } else {
+                    char err[] = "HTTP/1.1 400 Bad Request\r\nConnection: close\r\n\r\n{\"error\":\"No data to compress\"}";
                     send(ClientSocket, err, strlen(err), 0);
                 }
             }

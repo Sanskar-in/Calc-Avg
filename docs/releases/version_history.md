@@ -20,7 +20,13 @@ This document chronicles the legendary evolution of the **Calc-Avg** project, hi
 
 ---
 
-## 🌟 Version 4.1: The Unified Web Backend (LATEST)
+## 🚀 Version 4.2: The Ultimate Web Expansion (LATEST)
+**Status:** Released
+- **C-Powered Engineering Calculus:** Exposed a new `/api/calculus` endpoint. The web dashboard dynamically graphs the Numerical Integral (Area Under Curve) and exact Derivatives using the Trapezoidal Rule and Central Difference Theorem calculated purely in C.
+- **Cybersecurity Cryptography (SHA-256):** Added a `/api/crypto` API. The frontend can now request data integrity hashes, which are physically calculated by the C Engine's native SHA-256 logic and returned to the browser.
+- **Big Data Compression (RLE):** Added a `/api/compress` API. Users can input massive data arrays into the web dashboard, and the C server will compress them down to the byte level natively via Run-Length Encoding.
+
+## 🌟 Version 4.1: The Unified Web Backend
 **Status:** Released
 - **Advanced C API Microservice (`server.c`):** Upgraded the C `.exe` Server into a comprehensive API capable of intercepting historical data natively on Port 8080 and crunching Predictive AI and Quantitative Financial Algorithms.
 - **Frontend Thin-Client Integration (`web-app/script.js`):** Engineered the Web Application to act as a Thin Client. It now executes asynchronous `fetch()` API calls directly back to the `.exe`, rendering the C-computed variables dynamically onto `Chart.js` graphs.
