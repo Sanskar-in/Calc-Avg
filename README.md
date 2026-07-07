@@ -17,10 +17,11 @@ This tool goes far beyond simple addition and division—it is a comprehensive, 
 
 ## 🌟 Comprehensive Feature List
 
-Calc-Avg has evolved through to **Version 4.2** to include a massive suite of capabilities:
+Calc-Avg has evolved through to **Version 4.3** to include a massive suite of capabilities:
 
 ### 1. Advanced Statistical & Mathematical Engine
 - **Unified Web API Backend (`server.c`)**: The ultimate integration! The native C HTTP TCP Web Server (Port 8080) now acts as a complete JSON API Microservice. It serves the massive multi-tab Glassmorphism Web Dashboard directly to your browser. The Javascript `fetch()` APIs send data back to the C `.exe` Engine, which natively processes Advanced Statistics, Machine Learning (Linear Regression), Financial SMAs, Engineering Calculus (Integrals/Derivatives), Cybersecurity Crypto, and Data Compression routing the results back to the browser!
+- **Real-Time Live WebSockets (`ws://`)**: The C Backend natively intercepts `Upgrade: websocket` requests, computes the SHA-1 and Base64 cryptographic handshake via Windows APIs, and spawns a multithreaded stream pushing live mathematical JSON coordinates to the Web Dashboard at a blistering 20Hz!
 - **Standalone Client-Side Web App (`web-app/`)**: Calc-Avg is globally accessible! Version 4.0 introduced a 100% independent Javascript-powered Web Application. Perfect for GitHub Pages deployment.
 - **Premium Executable Metadata**: Commercial-grade polish! The `.exe` binary now natively contains Windows PE Header properties compiled via `windres` and `.rc` scripts. Hovering over the file explicitly displays the Company Name (Sanskar), the File Description, Copyrights, and the exact Version Number directly in Windows File Explorer!
 - **Data Sonification (Hardware Audio Generation)**: Make your math sing! The engine uses low-level Windows APIs to mathematically map your data array into physical audio frequencies (Hertz). It literally plays your data as musical tones through your speakers, culminating in a grand synthesized note for the final average!

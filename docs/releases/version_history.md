@@ -20,7 +20,13 @@ This document chronicles the legendary evolution of the **Calc-Avg** project, hi
 
 ---
 
-## 🚀 Version 4.2: The Ultimate Web Expansion (LATEST)
+## 🚀 Version 4.3: The Real-Time WebSocket Expansion (LATEST)
+**Status:** Released
+- **Native C WebSockets (`ws://`)**: Upgraded the C HTTP Server to natively accept `Upgrade: websocket` protocols.
+- **Wincrypt.h Handshake Protocol**: The C engine natively intercepts the `Sec-WebSocket-Key`, appends the GUID, hashes it with **SHA-1**, and encodes it via **Base64** using native Windows Cryptography APIs.
+- **High-Speed Data Streaming (20Hz)**: Spawns an independent C thread that generates native WebSocket Data Frames (Opcode `0x81`) and blasts live dynamically shifting mathematical data to the Web Dashboard 20 times per second!
+
+## 🌟 Version 4.2: The Ultimate Web Expansion
 **Status:** Released
 - **C-Powered Engineering Calculus:** Exposed a new `/api/calculus` endpoint. The web dashboard dynamically graphs the Numerical Integral (Area Under Curve) and exact Derivatives using the Trapezoidal Rule and Central Difference Theorem calculated purely in C.
 - **Cybersecurity Cryptography (SHA-256):** Added a `/api/crypto` API. The frontend can now request data integrity hashes, which are physically calculated by the C Engine's native SHA-256 logic and returned to the browser.

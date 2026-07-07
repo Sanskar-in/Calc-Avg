@@ -17,13 +17,66 @@
 #include "../include/crypto.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <sys/stat.h>
 #include <math.h>
 
 #ifdef _WIN32
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <wincrypt.h>
 #pragma comment(lib, "ws2_32.lib")
+#pragma comment(lib, "crypt32.lib")
+
+// For WebSocket Handshake
+void generate_ws_accept_key(const char* client_key, char* accept_key) {
+    char combined[256];
+    snprintf(combined, sizeof(combined), "%s258EAFA5-E914-47DA-95CA-C5AB0DC85B11", client_key);
+    
+    HCRYPTPROV hProv = 0;
+    HCRYPTHASH hHash = 0;
+    
+    if (CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT)) {
+        if (CryptCreateHash(hProv, CALG_SHA1, 0, 0, &hHash)) {
+            if (CryptHashData(hHash, (BYTE*)combined, strlen(combined), 0)) {
+                BYTE hashVal[20];
+                DWORD hashLen = 20;
+                if (CryptGetHashParam(hHash, HP_HASHVAL, hashVal, &hashLen, 0)) {
+                    DWORD base64Len = 0;
+                    CryptBinaryToStringA(hashVal, hashLen, CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, NULL, &base64Len);
+                    CryptBinaryToStringA(hashVal, hashLen, CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, accept_key, &base64Len);
+                }
+            }
+            CryptDestroyHash(hHash);
+        }
+        CryptReleaseContext(hProv, 0);
+    }
+}
+
+DWORD WINAPI websocket_stream_thread(LPVOID arg) {
+    SOCKET ws_socket = (SOCKET)arg;
+    double x = 0.0;
+    while (1) {
+        Sleep(50); // Fast 20Hz update!
+        x += 0.1;
+        double y = sin(x) * 100.0 + (rand() % 30); // Sine wave + noise
+        
+        char json_payload[128];
+        snprintf(json_payload, sizeof(json_payload), "{\"x\":%.2f, \"y\":%.2f}", x, y);
+        
+        int payload_len = strlen(json_payload);
+        BYTE frame[256];
+        
+        frame[0] = 0x81; // FIN + Text Frame
+        frame[1] = payload_len; // Unmasked (Server -> Client)
+        
+        memcpy(frame + 2, json_payload, payload_len);
+        
+        int bytesSent = send(ws_socket, (char*)frame, 2 + payload_len, 0);
+        if (bytesSent <= 0) break; // Client disconnected
+    }
+    closesocket(ws_socket);
+    return 0;
+}
 
 #define PORT 8080
 #define BUFFER_SIZE 8192
@@ -157,10 +210,10 @@ void launch_web_server(void) {
         closesocket(ListenSocket); WSACleanup(); return;
     }
 
-    printf("\n" COLOR_CYAN COLOR_BOLD "--- Web Server: Calc-Avg Version 4.2 API Expansion ---" COLOR_RESET "\n");
+    printf("\n" COLOR_CYAN COLOR_BOLD "--- Web Server: Calc-Avg Version 4.3 WebSocket Expansion ---" COLOR_RESET "\n");
     printf(COLOR_GREEN "Server is LIVE and listening on port %d" COLOR_RESET "\n", PORT);
     printf(COLOR_YELLOW "Open your Web Browser and navigate to: http://localhost:%d\n" COLOR_RESET, PORT);
-    printf("Serving Web App from 'web-app/'. API Routes: /api/calculus, /api/crypto, /api/compress...\n");
+    printf("Serving Web App from 'web-app/'. API Routes: /api/calculus, /api/crypto, ws://localhost:%d...\n", PORT);
     printf("Press Ctrl+C to stop the server and return to the terminal.\n\n");
 
     SOCKET ClientSocket;
@@ -176,6 +229,38 @@ void launch_web_server(void) {
             
             char method[16], path[1024];
             sscanf(buffer, "%15s %1023s", method, path);
+            
+            // Handle WebSockets
+            if (strstr(buffer, "Upgrade: websocket") != NULL) {
+                char* key_ptr = strstr(buffer, "Sec-WebSocket-Key: ");
+                if (key_ptr) {
+                    key_ptr += 19;
+                    char client_key[64];
+                    int i = 0;
+                    while (key_ptr[i] != '\r' && key_ptr[i] != '\n' && i < 63) {
+                        client_key[i] = key_ptr[i];
+                        i++;
+                    }
+                    client_key[i] = '\0';
+                    
+                    char accept_key[128] = {0};
+                    generate_ws_accept_key(client_key, accept_key);
+                    
+                    char response[512];
+                    snprintf(response, sizeof(response),
+                        "HTTP/1.1 101 Switching Protocols\r\n"
+                        "Upgrade: websocket\r\n"
+                        "Connection: Upgrade\r\n"
+                        "Sec-WebSocket-Accept: %s\r\n\r\n", accept_key);
+                        
+                    send(ClientSocket, response, strlen(response), 0);
+                    
+                    // Spawn stream thread
+                    CreateThread(NULL, 0, websocket_stream_thread, (LPVOID)ClientSocket, 0, NULL);
+                    printf("API Request: Upgraded to WebSocket. Spawning 20Hz stream thread!\n");
+                    continue; // Skip closesocket
+                }
+            }
             
             // API Endpoint: /api/calculate (Stats)
             if (strncmp(path, "/api/calculate", 14) == 0) {
