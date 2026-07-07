@@ -1,8 +1,8 @@
 #include <windows.h>
 
 1 VERSIONINFO
-FILEVERSION     4,3,0,0
-PRODUCTVERSION  4,3,0,0
+FILEVERSION     4,4,0,0
+PRODUCTVERSION  4,4,0,0
 FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
 FILEFLAGS       0x0L
 FILEOS          VOS_NT_WINDOWS32
@@ -14,13 +14,13 @@ BEGIN
     BLOCK "040904E4"
     BEGIN
       VALUE "CompanyName", "Sanskar"
-      VALUE "FileDescription", "Calc-Avg - The Universal Web API & Live Streaming Engine"
-      VALUE "FileVersion", "4.3.0.0"
+      VALUE "FileDescription", "Calc-Avg - The Universal Web API & Live Task Manager"
+      VALUE "FileVersion", "4.4.0.0"
       VALUE "InternalName", "calc_avg"
       VALUE "LegalCopyright", "(c) 2012-2026 Sanskar"
       VALUE "OriginalFilename", "calc_avg.exe"
       VALUE "ProductName", "Calc-Avg (Web API Edition)"
-      VALUE "ProductVersion", "4.3"
+      VALUE "ProductVersion", "4.4"
     END
   END
   BLOCK "VarFileInfo"

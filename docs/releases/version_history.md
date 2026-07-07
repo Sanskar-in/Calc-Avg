@@ -20,7 +20,13 @@ This document chronicles the legendary evolution of the **Calc-Avg** project, hi
 
 ---
 
-## 🚀 Version 4.3: The Real-Time WebSocket Expansion (LATEST)
+## 🚀 Version 4.4: The Live System Monitor Expansion (LATEST)
+**Status:** Released
+- **Windows Kernel Hardware APIs (`<windows.h>`)**: Engineered `get_cpu_usage()` and `get_ram_usage()` utilizing raw `GetSystemTimes()` and `GlobalMemoryStatusEx()` to extract the physical hardware metrics from the operating system natively in C.
+- **WebSocket Streaming Redesign**: Upgraded the `websocket_stream_thread` to blast the hardware JSON payloads (`{"cpu": %, "ram": %}`) at 10 Frames Per Second over the `ws://` TCP socket.
+- **Dual-Line Task Manager Graph**: The web dashboard now features a massive red/blue live chart rendering the live streams perfectly natively in the browser without reloading!
+
+## 🌟 Version 4.3: The Real-Time WebSocket Expansion
 **Status:** Released
 - **Native C WebSockets (`ws://`)**: Upgraded the C HTTP Server to natively accept `Upgrade: websocket` protocols.
 - **Wincrypt.h Handshake Protocol**: The C engine natively intercepts the `Sec-WebSocket-Key`, appends the GUID, hashes it with **SHA-1**, and encodes it via **Base64** using native Windows Cryptography APIs.

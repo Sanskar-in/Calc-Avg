@@ -52,16 +52,70 @@ void generate_ws_accept_key(const char* client_key, char* accept_key) {
     }
 }
 
+// --- Live Windows System Monitor (CPU & RAM) ---
+static FILETIME prev_idle, prev_kernel, prev_user;
+static int first_cpu_call = 1;
+
+static ULONGLONG file_time_2_utc(const FILETIME* ftime) {
+    ULARGE_INTEGER li;
+    li.LowPart = ftime->dwLowDateTime;
+    li.HighPart = ftime->dwHighDateTime;
+    return li.QuadPart;
+}
+
+double get_cpu_usage() {
+    FILETIME idle, kernel, user;
+    if (!GetSystemTimes(&idle, &kernel, &user)) return 0.0;
+    
+    if (first_cpu_call) {
+        prev_idle = idle;
+        prev_kernel = kernel;
+        prev_user = user;
+        first_cpu_call = 0;
+        return 0.0;
+    }
+    
+    ULONGLONG sys_idle = file_time_2_utc(&idle) - file_time_2_utc(&prev_idle);
+    ULONGLONG sys_kernel = file_time_2_utc(&kernel) - file_time_2_utc(&prev_kernel);
+    ULONGLONG sys_user = file_time_2_utc(&user) - file_time_2_utc(&prev_user);
+    
+    ULONGLONG sys_total = sys_kernel + sys_user;
+    
+    double cpu_usage = 0.0;
+    if (sys_total > 0) {
+        cpu_usage = ((sys_total - sys_idle) * 100.0) / sys_total;
+    }
+    
+    prev_idle = idle;
+    prev_kernel = kernel;
+    prev_user = user;
+    
+    return cpu_usage;
+}
+
+double get_ram_usage() {
+    MEMORYSTATUSEX memInfo;
+    memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+    if (!GlobalMemoryStatusEx(&memInfo)) return 0.0;
+    
+    DWORDLONG totalPhysMem = memInfo.ullTotalPhys;
+    DWORDLONG physMemUsed = memInfo.ullTotalPhys - memInfo.ullAvailPhys;
+    
+    if (totalPhysMem == 0) return 0.0;
+    return (double)physMemUsed / (double)totalPhysMem * 100.0;
+}
+
 DWORD WINAPI websocket_stream_thread(LPVOID arg) {
     SOCKET ws_socket = (SOCKET)arg;
     double x = 0.0;
     while (1) {
-        Sleep(50); // Fast 20Hz update!
-        x += 0.1;
-        double y = sin(x) * 100.0 + (rand() % 30); // Sine wave + noise
+        Sleep(100); // 10Hz Update to allow CPU delta to accumulate
+        
+        double cpu = get_cpu_usage();
+        double ram = get_ram_usage();
         
         char json_payload[128];
-        snprintf(json_payload, sizeof(json_payload), "{\"x\":%.2f, \"y\":%.2f}", x, y);
+        snprintf(json_payload, sizeof(json_payload), "{\"cpu\":%.2f, \"ram\":%.2f}", cpu, ram);
         
         int payload_len = strlen(json_payload);
         BYTE frame[256];
@@ -210,7 +264,7 @@ void launch_web_server(void) {
         closesocket(ListenSocket); WSACleanup(); return;
     }
 
-    printf("\n" COLOR_CYAN COLOR_BOLD "--- Web Server: Calc-Avg Version 4.3 WebSocket Expansion ---" COLOR_RESET "\n");
+    printf("\n" COLOR_CYAN COLOR_BOLD "--- Web Server: Calc-Avg Version 4.4 Live System Monitor ---" COLOR_RESET "\n");
     printf(COLOR_GREEN "Server is LIVE and listening on port %d" COLOR_RESET "\n", PORT);
     printf(COLOR_YELLOW "Open your Web Browser and navigate to: http://localhost:%d\n" COLOR_RESET, PORT);
     printf("Serving Web App from 'web-app/'. API Routes: /api/calculus, /api/crypto, ws://localhost:%d...\n", PORT);
@@ -257,7 +311,7 @@ void launch_web_server(void) {
                     
                     // Spawn stream thread
                     CreateThread(NULL, 0, websocket_stream_thread, (LPVOID)ClientSocket, 0, NULL);
-                    printf("API Request: Upgraded to WebSocket. Spawning 20Hz stream thread!\n");
+                    printf("API Request: Upgraded to WebSocket. Spawning 10Hz System Monitor stream thread!\n");
                     continue; // Skip closesocket
                 }
             }
