@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calc-Avg | Standalone Web Version (v4.0)</title>
+    
+    <!-- Premium Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js for Data Visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Animated Glassmorphism Background -->
+    <div class="background-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="orb orb-4"></div>
+    </div>
+
+    <main class="app-container">
+        <header class="app-header">
+            <h1 class="gradient-text">Calc-Avg</h1>
+            <p class="subtitle">Global Web Edition • Version 4.0</p>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="glass-tabs">
+            <button class="tab-btn active" data-tab="advanced-stats">Advanced Stats</button>
+            <button class="tab-btn" data-tab="predictive-ai">Predictive AI</button>
+            <button class="tab-btn" data-tab="financial-sma">Financial SMA</button>
+        </nav>
+
+        <div class="glass-panel main-panel">
+            
+            <!-- TAB 1: Advanced Stats -->
+            <section id="advanced-stats" class="tab-content active">
+                <h2>Advanced Statistical Analysis</h2>
+                <form id="stats-form">
+                    <div class="input-group">
+                        <label for="stats-data">Enter numerical data array (comma-separated):</label>
+                        <textarea id="stats-data" placeholder="e.g. 15.2, 42.8, 99.1, 7, 22.5" required></textarea>
+                    </div>
+                    <button type="submit" class="glow-button primary-btn">
+                        <span>Execute Mathematical Engine</span>
+                    </button>
+                </form>
+
+                <div id="stats-results" class="results-container hidden">
+                    <div class="stats-grid" id="stats-grid-container">
+                        <!-- JS injected cards -->
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="statsChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: Predictive AI -->
+            <section id="predictive-ai" class="tab-content hidden">
+                <h2>Machine Learning: Linear Regression</h2>
+                <form id="ml-form">
+                    <div class="input-group">
+                        <label for="ml-data">Enter historical data points to train model:</label>
+                        <textarea id="ml-data" placeholder="e.g. 100, 150, 200, 300, 450" required></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label for="ml-future">Number of future periods to predict:</label>
+                        <input type="number" id="ml-future" value="3" min="1" max="50" required>
+                    </div>
+                    <button type="submit" class="glow-button secondary-btn">
+                        <span>Train AI & Predict Future</span>
+                    </button>
+                </form>
+
+                <div id="ml-results" class="results-container hidden">
+                    <div class="equation-box" id="ml-equation"></div>
+                    <div class="chart-container">
+                        <canvas id="mlChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: Financial SMA -->
+            <section id="financial-sma" class="tab-content hidden">
+                <h2>Quantitative Market Analysis (SMA)</h2>
+                <form id="sma-form">
+                    <div class="input-group">
+                        <label for="sma-data">Enter historical asset prices:</label>
+                        <textarea id="sma-data" placeholder="e.g. 150.2, 151.4, 153.8, 152.1, 155.0, 157.2" required></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label for="sma-window">Moving Average Window Period:</label>
+                        <input type="number" id="sma-window" value="3" min="2" max="100" required>
+                    </div>
+                    <button type="submit" class="glow-button tertiary-btn">
+                        <span>Calculate Moving Averages</span>
+                    </button>
+                </form>
+
+                <div id="sma-results" class="results-container hidden">
+                    <div class="chart-container">
+                        <canvas id="smaChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+        
+        <footer class="app-footer">
+            <p>&copy; Copyright Sanskar. All rights reserved. <br> Powered by Client-Side WebAssembly & JS <br>
+            <a href="https://github.com/Sanskar-in/Calc-Avg" target="_blank">View Project on GitHub</a></p>
+        </footer>
+    </main>
+
+    <!-- JS Math Engine -->
+    <script src="script.js"></script>
+</body>
+</html>

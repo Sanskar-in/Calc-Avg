@@ -20,7 +20,13 @@ This document chronicles the legendary evolution of the **Calc-Avg** project, hi
 
 ---
 
-## 🌟 Version 4.0: The Global Web App Release (LATEST)
+## 🌟 Version 4.1: The Unified Web Backend (LATEST)
+**Status:** Released
+- **Advanced C API Microservice (`server.c`):** Upgraded the C `.exe` Server into a comprehensive API capable of intercepting historical data natively on Port 8080 and crunching Predictive AI and Quantitative Financial Algorithms.
+- **Frontend Thin-Client Integration (`web-app/script.js`):** Engineered the Web Application to act as a Thin Client. It now executes asynchronous `fetch()` API calls directly back to the `.exe`, rendering the C-computed variables dynamically onto `Chart.js` graphs.
+- **Unified File Serving:** The C server now directly hosts the massive multi-tab `web-app/` directory (serving `index.html`, `style.css`, and `script.js` natively to the browser).
+
+## 🌐 Version 4.0: The Global Web App Release
 **Status:** Released
 - **Standalone Web Architecture (`web-app/`):** Engineered a 100% independent Client-Side Web Application. Users can now run Calc-Avg natively in the browser without requiring the C `.exe` server. Perfect for GitHub Pages deployment.
 - **JavaScript Math Engine:** Ported the core C intelligence into high-performance JS, natively calculating Advanced Statistics, Financial SMA, and Predictive AI (Linear Regression).

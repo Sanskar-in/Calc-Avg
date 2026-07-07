@@ -17,12 +17,12 @@ This tool goes far beyond simple addition and division—it is a comprehensive, 
 
 ## 🌟 Comprehensive Feature List
 
-Calc-Avg has evolved through to **Version 4.0** to include a massive suite of capabilities:
+Calc-Avg has evolved through to **Version 4.1** to include a massive suite of capabilities:
 
 ### 1. Advanced Statistical & Mathematical Engine
-- **Standalone Client-Side Web App (`web-app/`)**: Calc-Avg is now globally accessible! Version 4.0 introduces a 100% independent Javascript-powered Web Application. It natively ports the C intelligence into the browser, calculating Advanced Statistics, Predictive AI (Linear Regression), and Financial SMAs entirely on the client side with a stunning Glassmorphism UI and `Chart.js` integrations! Perfect for GitHub Pages deployment.
+- **Unified Web API Backend (`server.c`)**: The ultimate integration! The native C HTTP TCP Web Server (Port 8080) now acts as a complete JSON API Microservice. It serves the massive multi-tab Glassmorphism Web Dashboard directly to your browser. When you use the dashboard, the Javascript `fetch()` APIs send the data back to the C `.exe` Engine, which natively processes the Advanced Statistics, Machine Learning (Linear Regression), and Financial SMAs, routing the JSON results back to the browser for `Chart.js` rendering!
+- **Standalone Client-Side Web App (`web-app/`)**: Calc-Avg is globally accessible! Version 4.0 introduced a 100% independent Javascript-powered Web Application. Perfect for GitHub Pages deployment.
 - **Premium Executable Metadata**: Commercial-grade polish! The `.exe` binary now natively contains Windows PE Header properties compiled via `windres` and `.rc` scripts. Hovering over the file explicitly displays the Company Name (Sanskar), the File Description, Copyrights, and the exact Version Number directly in Windows File Explorer!
-- **JSON REST API & Web Dashboard**: Transform the application into a Web Microservice! The C engine utilizes `winsock2` to host a native HTTP TCP Web Server on Port 8080. It serves a stunning Glassmorphism Web Dashboard featuring interactive forms, dynamic AJAX (Fetch API) requests, and beautiful `Chart.js` Data Visualizations! The C backend computes advanced statistics and returns structured JSON responses.
 - **Data Sonification (Hardware Audio Generation)**: Make your math sing! The engine uses low-level Windows APIs to mathematically map your data array into physical audio frequencies (Hertz). It literally plays your data as musical tones through your speakers, culminating in a grand synthesized note for the final average!
 - **Cybersecurity Cryptography (SHA-256)**: Military-grade security! After calculating a mathematical average, the C engine processes the memory via a pure C implementation of SHA-256 to generate an irreversible, 64-character cryptographic hash signature ensuring absolute data integrity!
 - **Big Data Compression (RLE)**: Optimize your memory footprint! The engine utilizes Run-Length Encoding to mathematically compress massive repetitive data arrays down to the raw byte level, and dynamically calculates the average from the compressed stream!
