@@ -17,10 +17,10 @@ This tool goes far beyond simple addition and division—it is a comprehensive, 
 
 ## 🌟 Comprehensive Feature List
 
-Calc-Avg has evolved through to **Version 3.2** to include a massive suite of capabilities:
+Calc-Avg has evolved through to **Version 4.0** to include a massive suite of capabilities:
 
 ### 1. Advanced Statistical & Mathematical Engine
-
+- **Standalone Client-Side Web App (`web-app/`)**: Calc-Avg is now globally accessible! Version 4.0 introduces a 100% independent Javascript-powered Web Application. It natively ports the C intelligence into the browser, calculating Advanced Statistics, Predictive AI (Linear Regression), and Financial SMAs entirely on the client side with a stunning Glassmorphism UI and `Chart.js` integrations! Perfect for GitHub Pages deployment.
 - **Premium Executable Metadata**: Commercial-grade polish! The `.exe` binary now natively contains Windows PE Header properties compiled via `windres` and `.rc` scripts. Hovering over the file explicitly displays the Company Name (Sanskar), the File Description, Copyrights, and the exact Version Number directly in Windows File Explorer!
 - **JSON REST API & Web Dashboard**: Transform the application into a Web Microservice! The C engine utilizes `winsock2` to host a native HTTP TCP Web Server on Port 8080. It serves a stunning Glassmorphism Web Dashboard featuring interactive forms, dynamic AJAX (Fetch API) requests, and beautiful `Chart.js` Data Visualizations! The C backend computes advanced statistics and returns structured JSON responses.
 - **Data Sonification (Hardware Audio Generation)**: Make your math sing! The engine uses low-level Windows APIs to mathematically map your data array into physical audio frequencies (Hertz). It literally plays your data as musical tones through your speakers, culminating in a grand synthesized note for the final average!

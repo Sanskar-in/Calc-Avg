@@ -20,7 +20,13 @@ This document chronicles the legendary evolution of the **Calc-Avg** project, hi
 
 ---
 
-## 🌟 Version 3.2: The Premium Metadata Update (LATEST)
+## 🌟 Version 4.0: The Global Web App Release (LATEST)
+**Status:** Released
+- **Standalone Web Architecture (`web-app/`):** Engineered a 100% independent Client-Side Web Application. Users can now run Calc-Avg natively in the browser without requiring the C `.exe` server. Perfect for GitHub Pages deployment.
+- **JavaScript Math Engine:** Ported the core C intelligence into high-performance JS, natively calculating Advanced Statistics, Financial SMA, and Predictive AI (Linear Regression).
+- **Multi-Tab Dashboard:** Built an ultra-premium Glassmorphism interface featuring animated orbs, glowing inputs, and advanced `Chart.js` integrations across all mathematical modes.
+
+## 🏆 Version 3.2: The Premium Metadata Update
 **Status:** Released
 - **Windows Portable Executable (PE) Metadata Injection:** Compiled a native C-Resource script (`calc_avg.rc`) containing the official Windows `VERSIONINFO` block.
 - **Embedded Properties:** Hovering over `calc_avg.exe` in Windows natively displays the Company Name (**Sanskar**), File Description, Copyrights, and Version Number (3.2.0.0).
