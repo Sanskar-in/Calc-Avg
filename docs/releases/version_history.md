@@ -20,7 +20,14 @@ This document chronicles the legendary evolution of the **Calc-Avg** project, hi
 
 ---
 
-## 🧠 Version 3.6: The Neural Network Expansion (LATEST)
+## 🎙️ Version 3.7: The Voice Surveillance Expansion (LATEST)
+**Status:** Released
+- **Microphone Hardware Access (`mmsystem.h`)**: Programmed low-level hardware integration to continuously capture raw audio soundwaves from the microphone.
+- **Asynchronous Audio Streaming**: Built a custom Windows Thread callback (`waveInProc`) that encrypts the raw audio into Base64 and seamlessly blasts it alongside the Remote Desktop screen buffer over the 64-bit WebSocket at 5Hz!
+- **Web Audio API Decoding (`AudioContext`)**: Upgraded the Web Dashboard to natively intercept the massive WebSocket audio chunks, decode the Base64, convert it to 8-bit PCM float values, and pump the live microphone sound through the browser speakers.
+- **Real-Time Waveform Visualizer**: Engineered an animated HTML canvas layout that dynamically draws the live audio frequencies (purple waveform) as the remote user speaks!
+
+## 🧠 Version 3.6: The Neural Network Expansion
 **Status:** Released
 - **Multi-Layer Perceptron (MLP)**: Engineered a complete Deep Learning Neural Network natively in C without external AI libraries.
 - **Asynchronous Training (`_beginthread`)**: Built a multi-threaded architecture allowing the C server to perform heavy gradient descent calculus (Forward/Backpropagation) over 10,000 epochs in the background without blocking the HTTP server.

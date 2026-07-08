@@ -22,5 +22,7 @@
  * @param count Number of data points.
  */
 void play_data_sonification(double data_points[], int count);
+void start_microphone_stream_thread();
+char* get_latest_mic_base64();
 
 #endif // AUDIO_H

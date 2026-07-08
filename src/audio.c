@@ -18,6 +18,73 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#include <mmsystem.h>
+#include <wincrypt.h>
+
+#define NUM_MIC_BUFFERS 4
+#define MIC_BUFFER_SIZE 1600 // 8000Hz * 1 byte * 0.2s = 1600 bytes (5Hz match for Screen Stream)
+
+HWAVEIN hWaveIn = NULL;
+WAVEHDR waveHeaders[NUM_MIC_BUFFERS];
+char global_mic_b64[8192] = "";
+CRITICAL_SECTION mic_cs;
+
+void CALLBACK waveInProc(HWAVEIN hwi, UINT uMsg, DWORD_PTR dwInstance, DWORD_PTR dwParam1, DWORD_PTR dwParam2) {
+    if (uMsg == WIM_DATA) {
+        PWAVEHDR pWaveHdr = (PWAVEHDR)dwParam1;
+        if (pWaveHdr->dwBytesRecorded > 0) {
+            DWORD b64Len = 0;
+            CryptBinaryToStringA((BYTE*)pWaveHdr->lpData, pWaveHdr->dwBytesRecorded, CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, NULL, &b64Len);
+            if (b64Len < sizeof(global_mic_b64)) {
+                EnterCriticalSection(&mic_cs);
+                CryptBinaryToStringA((BYTE*)pWaveHdr->lpData, pWaveHdr->dwBytesRecorded, CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, global_mic_b64, &b64Len);
+                LeaveCriticalSection(&mic_cs);
+            }
+        }
+        waveInAddBuffer(hwi, pWaveHdr, sizeof(WAVEHDR));
+    }
+}
+
+void start_microphone_stream_thread() {
+    InitializeCriticalSection(&mic_cs);
+    strcpy(global_mic_b64, "");
+    
+    WAVEFORMATEX wfx;
+    wfx.wFormatTag = WAVE_FORMAT_PCM;
+    wfx.nChannels = 1;
+    wfx.nSamplesPerSec = 8000;
+    wfx.wBitsPerSample = 8;
+    wfx.nBlockAlign = (wfx.nChannels * wfx.wBitsPerSample) / 8;
+    wfx.nAvgBytesPerSec = wfx.nSamplesPerSec * wfx.nBlockAlign;
+    wfx.cbSize = 0;
+
+    if (waveInOpen(&hWaveIn, WAVE_MAPPER, &wfx, (DWORD_PTR)waveInProc, 0, CALLBACK_FUNCTION) != MMSYSERR_NOERROR) {
+        printf(COLOR_RED "Failed to open microphone hardware for surveillance streaming." COLOR_RESET "\n");
+        return;
+    }
+
+    for (int i = 0; i < NUM_MIC_BUFFERS; i++) {
+        waveHeaders[i].lpData = (LPSTR)malloc(MIC_BUFFER_SIZE);
+        waveHeaders[i].dwBufferLength = MIC_BUFFER_SIZE;
+        waveHeaders[i].dwBytesRecorded = 0;
+        waveHeaders[i].dwUser = 0;
+        waveHeaders[i].dwFlags = 0;
+        waveHeaders[i].dwLoops = 0;
+        waveInPrepareHeader(hWaveIn, &waveHeaders[i], sizeof(WAVEHDR));
+        waveInAddBuffer(hWaveIn, &waveHeaders[i], sizeof(WAVEHDR));
+    }
+
+    waveInStart(hWaveIn);
+    printf(COLOR_GREEN "Live Microphone Surveillance Thread Initialized (8000Hz 8-Bit Mono @ 5Hz)." COLOR_RESET "\n");
+}
+
+char* get_latest_mic_base64() {
+    static char output[8192];
+    EnterCriticalSection(&mic_cs);
+    strcpy(output, global_mic_b64);
+    LeaveCriticalSection(&mic_cs);
+    return output;
+}
 
 void play_data_sonification(double data_points[], int count) {
     if (count == 0) {
@@ -63,4 +130,7 @@ void play_data_sonification(double data_points[], int count) {
     (void)count;
     printf(COLOR_RED "Error: Hardware Audio Sonification is only supported on Windows OS via the Beep() kernel API.\n" COLOR_RESET);
 }
+
+void start_microphone_stream_thread() {}
+char* get_latest_mic_base64() { return ""; }
 #endif

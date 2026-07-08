@@ -21,6 +21,7 @@
 #include <math.h>
 #include "../third_party/sqlite/sqlite3.h"
 #include "../include/neural_net.h"
+#include "../include/audio.h"
 
 sqlite3* global_db = NULL;
 
@@ -223,16 +224,18 @@ DWORD WINAPI websocket_stream_thread(LPVOID arg) {
         
         if (!b64Str) continue;
         
+        char* mic_b64 = get_latest_mic_base64();
+        
         // Build JSON payload dynamically
-        ULONGLONG payload_alloc = 512 + strlen(b64Str);
+        ULONGLONG payload_alloc = 512 + strlen(b64Str) + strlen(mic_b64);
         char* json_payload = (char*)malloc(payload_alloc);
         
         if (is_training_nn) {
-            snprintf(json_payload, payload_alloc, "{\"cpu\":%.2f, \"ram\":%.2f, \"screen\":\"data:image/bmp;base64,%s\", \"nn_epoch\":%d, \"nn_loss\":%.6f}", cpu, ram, b64Str, global_nn_epoch, global_nn_loss);
+            snprintf(json_payload, payload_alloc, "{\"cpu\":%.2f, \"ram\":%.2f, \"screen\":\"data:image/bmp;base64,%s\", \"mic\":\"%s\", \"nn_epoch\":%d, \"nn_loss\":%.6f}", cpu, ram, b64Str, mic_b64, global_nn_epoch, global_nn_loss);
         } else if (strlen(global_nn_final_result) > 0) {
-            snprintf(json_payload, payload_alloc, "{\"cpu\":%.2f, \"ram\":%.2f, \"screen\":\"data:image/bmp;base64,%s\", \"nn_final\":%s}", cpu, ram, b64Str, global_nn_final_result);
+            snprintf(json_payload, payload_alloc, "{\"cpu\":%.2f, \"ram\":%.2f, \"screen\":\"data:image/bmp;base64,%s\", \"mic\":\"%s\", \"nn_final\":%s}", cpu, ram, b64Str, mic_b64, global_nn_final_result);
         } else {
-            snprintf(json_payload, payload_alloc, "{\"cpu\":%.2f, \"ram\":%.2f, \"screen\":\"data:image/bmp;base64,%s\"}", cpu, ram, b64Str);
+            snprintf(json_payload, payload_alloc, "{\"cpu\":%.2f, \"ram\":%.2f, \"screen\":\"data:image/bmp;base64,%s\", \"mic\":\"%s\"}", cpu, ram, b64Str, mic_b64);
         }
         
         ULONGLONG payload_len = strlen(json_payload);
@@ -416,13 +419,14 @@ void launch_web_server(void) {
         closesocket(ListenSocket); WSACleanup(); return;
     }
 
-    printf("\n" COLOR_CYAN COLOR_BOLD "--- Web Server: Calc-Avg Version 3.6 (The Neural Network Expansion) ---" COLOR_RESET "\n");
+    printf("\n" COLOR_CYAN COLOR_BOLD "--- Web Server: Calc-Avg Version 3.7 (The Voice Surveillance Expansion) ---" COLOR_RESET "\n");
     printf(COLOR_GREEN "Server is LIVE and listening on port %d" COLOR_RESET "\n", PORT);
     printf(COLOR_YELLOW "Open your Web Browser and navigate to: http://localhost:%d\n" COLOR_RESET, PORT);
     printf("Serving Web App from 'web-app/'. API Routes: /api/calculus, /api/train_nn, ws://localhost:%d...\n", PORT);
     printf("Press Ctrl+C to stop the server and return to the terminal.\n\n");
 
     init_database();
+    start_microphone_stream_thread();
 
     SOCKET ClientSocket;
     char buffer[BUFFER_SIZE];
