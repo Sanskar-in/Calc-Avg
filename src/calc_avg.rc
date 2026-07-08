@@ -3,8 +3,8 @@
 MAINICON ICON "icon.ico"
 
 1 VERSIONINFO
-FILEVERSION     3,7,0,0
-PRODUCTVERSION  3,7,0,0
+FILEVERSION     3,8,0,0
+PRODUCTVERSION  3,8,0,0
 FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
 FILEFLAGS       0x0L
 FILEOS          VOS_NT_WINDOWS32
@@ -16,13 +16,13 @@ BEGIN
     BLOCK "040904E4"
     BEGIN
       VALUE "CompanyName", "Sanskar"
-      VALUE "FileDescription", "Calc-Avg - The Universal Web API & Live Remote Desktop"
-      VALUE "FileVersion", "3.7.0.0"
+      VALUE "FileDescription", "Calc-Avg - The Universal Web API & Big Data C Engine"
+      VALUE "FileVersion", "3.8.0.0"
       VALUE "InternalName", "calc_avg"
       VALUE "LegalCopyright", "(c) 2012-2026 Sanskar"
       VALUE "OriginalFilename", "calc_avg.exe"
       VALUE "ProductName", "Calc-Avg (Web API Edition)"
-      VALUE "ProductVersion", "3.7"
+      VALUE "ProductVersion", "3.8"
     END
   END
   BLOCK "VarFileInfo"

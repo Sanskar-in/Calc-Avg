@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <math.h>
+#include <ctype.h>
 #include "../third_party/sqlite/sqlite3.h"
 #include "../include/neural_net.h"
 #include "../include/audio.h"
@@ -780,6 +781,73 @@ void launch_web_server(void) {
                 } else {
                     char err[] = "HTTP/1.1 400 Bad Request\r\nConnection: close\r\n\r\n{\"error\":\"Need at least 2 data points for training\"}";
                     send(ClientSocket, err, strlen(err), 0);
+                }
+            }
+            // API Endpoint: /api/upload_csv (Big Data POST Request)
+            else if (strcmp(method, "POST") == 0 && strncmp(path, "/api/upload_csv", 15) == 0) {
+                char* cl_ptr = strstr(buffer, "Content-Length: ");
+                int content_length = 0;
+                if (cl_ptr) content_length = atoi(cl_ptr + 16);
+                
+                char* body_start = strstr(buffer, "\r\n\r\n");
+                if (body_start) {
+                    body_start += 4;
+                    int headers_len = body_start - buffer;
+                    int body_received = bytesReceived - headers_len;
+                    
+                    char* full_body = (char*)malloc(content_length + 1);
+                    if (full_body) {
+                        memcpy(full_body, body_start, body_received);
+                        int total_body_received = body_received;
+                        
+                        while (total_body_received < content_length) {
+                            int r = recv(ClientSocket, full_body + total_body_received, content_length - total_body_received, 0);
+                            if (r <= 0) break;
+                            total_body_received += r;
+                        }
+                        full_body[total_body_received] = '\0';
+                        
+                        int count = 0;
+                        double sum = 0, min = 99999999, max = -99999999;
+                        
+                        char* csv_start = strstr(full_body, "\r\n\r\n");
+                        if (csv_start) {
+                            csv_start += 4;
+                            char* ptr = csv_start;
+                            
+                            while (*ptr && count < 1000000) {
+                                while (*ptr && !isdigit(*ptr) && *ptr != '-' && *ptr != '.') {
+                                    if (strncmp(ptr, "\r\n--", 4) == 0) break;
+                                    ptr++;
+                                }
+                                if (strncmp(ptr, "\r\n--", 4) == 0) break;
+                                if (!*ptr) break;
+                                
+                                double val = strtod(ptr, &ptr);
+                                sum += val;
+                                if (val < min) min = val;
+                                if (val > max) max = val;
+                                count++;
+                            }
+                        }
+                        
+                        if (count > 0) {
+                            double avg = sum / count;
+                            char json_resp[1024];
+                            snprintf(json_resp, sizeof(json_resp), "{\"status\": \"success\", \"count\": %d, \"average\": %.4f, \"min\": %.4f, \"max\": %.4f}", count, avg, min, max);
+                            
+                            printf("API Request: Parsed massive CSV with %d rows. Average: %.4f\n", count, avg);
+                            log_to_db("Big Data Expansion", "Massive CSV Upload", json_resp);
+                            
+                            char header[] = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n";
+                            send(ClientSocket, header, strlen(header), 0);
+                            send(ClientSocket, json_resp, strlen(json_resp), 0);
+                        } else {
+                            char err[] = "HTTP/1.1 400 Bad Request\r\nConnection: close\r\n\r\n{\"error\":\"No valid numeric data found in CSV\"}";
+                            send(ClientSocket, err, strlen(err), 0);
+                        }
+                        free(full_body);
+                    }
                 }
             }
             // API Endpoint: /api/history (SQLite Database Query)

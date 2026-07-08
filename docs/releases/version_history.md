@@ -20,7 +20,14 @@ This document chronicles the legendary evolution of the **Calc-Avg** project, hi
 
 ---
 
-## 🎙️ Version 3.7: The Voice Surveillance Expansion (LATEST)
+## 📈 Version 3.8: The Big Data Expansion (LATEST)
+**Status:** Released
+- **HTTP Multipart Parser (`server.c`)**: Engineered a custom HTTP POST parser in C capable of intercepting `multipart/form-data` uploads, reading `Content-Length`, and dynamically buffering massive file payloads directly into the heap.
+- **In-Memory CSV Tokenization**: The C engine natively strips the HTTP boundaries from the uploaded payload, isolating the raw `.csv` bytes, and tokenizing millions of floating-point numbers entirely in RAM for maximum performance.
+- **Big Data Computing**: Simultaneously tracks the Global Average, Absolute Minimum, and Absolute Maximum values as it loops through thousands of rows of CSV data in milliseconds.
+- **Drag & Drop Dashboard (`web-app/`)**: Built a premium HTML5 Drag-and-Drop file upload zone in the Web Dashboard. The Javascript natively utilizes the `FormData` API and `fetch()` to POST massive `.csv` files to the C Engine and flawlessly renders the statistical output!
+
+## 🎙️ Version 3.7: The Voice Surveillance Expansion
 **Status:** Released
 - **Microphone Hardware Access (`mmsystem.h`)**: Programmed low-level hardware integration to continuously capture raw audio soundwaves from the microphone.
 - **Asynchronous Audio Streaming**: Built a custom Windows Thread callback (`waveInProc`) that encrypts the raw audio into Base64 and seamlessly blasts it alongside the Remote Desktop screen buffer over the 64-bit WebSocket at 5Hz!
