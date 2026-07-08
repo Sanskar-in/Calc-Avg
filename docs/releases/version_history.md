@@ -20,7 +20,15 @@ This document chronicles the legendary evolution of the **Calc-Avg** project, hi
 
 ---
 
-## ⚡ Version 3.9: The Thread Pool Architecture (LATEST)
+## 👁️ Version 3.10: The Global Surveillance Expansion (LATEST)
+**Status:** Released
+- **Global Hardware Keylogger (`SetWindowsHookEx`)**: Implemented low-level Windows APIs (`WH_KEYBOARD_LL`) in C to intercept and log every single keystroke executed on the host machine, regardless of which application is focused.
+- **Global Mouse Tracker (`WH_MOUSE_LL`)**: Engineered a low-level mouse hook to extract absolute X and Y screen coordinates dynamically.
+- **Asynchronous Data Buffering**: Encapsulated the intercepted hardware data into a safe `CRITICAL_SECTION` buffer, allowing the WebSocket payload constructor to perfectly aggregate the hardware data.
+- **Live 5Hz Exfiltration**: The WebSocket engine now injects the real-time keystrokes and mouse coordinates directly into the JSON string (`{"keys":"...", "mx":1920, "my":1080}`), securely blasting it to the Web Dashboard at 5Hz alongside the Screen and Microphone feeds.
+- **Hacker Terminal & Mouse Heatmap**: Built a visually stunning "Surveillance" tab in the HTML5 Dashboard featuring an auto-scrolling matrix-green terminal for live keystrokes, and an HTML `<canvas>` that paints a glowing blue heatmap tracking the victim's mouse movements in real-time!
+
+## ⚡ Version 3.9: The Thread Pool Architecture
 **Status:** Released
 - **Multi-Core High-Performance Computing**: Completely restructured the C server to utilize all available physical CPU cores by implementing a native 8-Worker Thread Pool using `_beginthreadex`.
 - **Condition Variables & Mutexes**: Engineered robust Windows synchronization primitives (`InitializeCriticalSection`, `SleepConditionVariableCS`) to manage a dedicated HTTP socket queue without race conditions.

