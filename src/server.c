@@ -398,43 +398,37 @@ void api_compress_data(const double* numbers, int count, char* compressed_hex, i
     }
 }
 
-// The main web server loop
-void launch_web_server(void) {
-    WSADATA wsaData;
-    int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-    if (iResult != 0) return;
 
-    SOCKET ListenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (ListenSocket == INVALID_SOCKET) { WSACleanup(); return; }
 
-    struct sockaddr_in serverAddr;
-    serverAddr.sin_family = AF_INET;
-    serverAddr.sin_addr.s_addr = INADDR_ANY;
-    serverAddr.sin_port = htons(PORT);
 
-    if (bind(ListenSocket, (SOCKADDR*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
-        closesocket(ListenSocket); WSACleanup(); return;
-    }
+// --- Thread Pool Variables ---
+#define THREAD_POOL_SIZE 8
+#define QUEUE_SIZE 256
 
-    if (listen(ListenSocket, SOMAXCONN) == SOCKET_ERROR) {
-        closesocket(ListenSocket); WSACleanup(); return;
-    }
+SOCKET client_queue[QUEUE_SIZE];
+int queue_head = 0;
+int queue_tail = 0;
+int queue_count = 0;
+CRITICAL_SECTION queue_lock;
+CONDITION_VARIABLE queue_cond;
 
-    printf("\n" COLOR_CYAN COLOR_BOLD "--- Web Server: Calc-Avg Version 3.7 (The Voice Surveillance Expansion) ---" COLOR_RESET "\n");
-    printf(COLOR_GREEN "Server is LIVE and listening on port %d" COLOR_RESET "\n", PORT);
-    printf(COLOR_YELLOW "Open your Web Browser and navigate to: http://localhost:%d\n" COLOR_RESET, PORT);
-    printf("Serving Web App from 'web-app/'. API Routes: /api/calculus, /api/train_nn, ws://localhost:%d...\n", PORT);
-    printf("Press Ctrl+C to stop the server and return to the terminal.\n\n");
-
-    init_database();
-    start_microphone_stream_thread();
-
-    SOCKET ClientSocket;
+unsigned __stdcall worker_thread_func(void* arg) {
     char buffer[BUFFER_SIZE];
-
     while (1) {
-        ClientSocket = accept(ListenSocket, NULL, NULL);
+        SOCKET ClientSocket = INVALID_SOCKET;
+        
+        EnterCriticalSection(&queue_lock);
+        while (queue_count == 0) {
+            SleepConditionVariableCS(&queue_cond, &queue_lock, INFINITE);
+        }
+        
+        ClientSocket = client_queue[queue_head];
+        queue_head = (queue_head + 1) % QUEUE_SIZE;
+        queue_count--;
+        LeaveCriticalSection(&queue_lock);
+        
         if (ClientSocket == INVALID_SOCKET) continue;
+
 
         int bytesReceived = recv(ClientSocket, buffer, BUFFER_SIZE - 1, 0);
         if (bytesReceived > 0) {
@@ -917,10 +911,68 @@ void launch_web_server(void) {
         }
         closesocket(ClientSocket);
     }
+    return 0;
+}
+
+// The main web server loop
+void launch_web_server(void) {
+    WSADATA wsaData;
+    int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    if (iResult != 0) return;
+
+    SOCKET ListenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (ListenSocket == INVALID_SOCKET) { WSACleanup(); return; }
+
+    struct sockaddr_in serverAddr;
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_addr.s_addr = INADDR_ANY;
+    serverAddr.sin_port = htons(PORT);
+
+    if (bind(ListenSocket, (SOCKADDR*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
+        closesocket(ListenSocket); WSACleanup(); return;
+    }
+
+    if (listen(ListenSocket, SOMAXCONN) == SOCKET_ERROR) {
+        closesocket(ListenSocket); WSACleanup(); return;
+    }
+
+    printf("\n" COLOR_CYAN COLOR_BOLD "--- Web Server: Calc-Avg Version 3.9 (The Thread Pool Architecture) ---" COLOR_RESET "\n");
+    printf(COLOR_GREEN "Server is LIVE and listening on port %d" COLOR_RESET "\n", PORT);
+    printf(COLOR_YELLOW "Open your Web Browser and navigate to: http://localhost:%d\n" COLOR_RESET, PORT);
+    printf("Serving Web App from 'web-app/'. API Routes: /api/calculus, /api/train_nn, ws://localhost:%d...\n", PORT);
+    printf("Press Ctrl+C to stop the server and return to the terminal.\n\n");
+
+    init_database();
+    start_microphone_stream_thread();
+    
+    InitializeCriticalSection(&queue_lock);
+    InitializeConditionVariable(&queue_cond);
+    
+    for (int i = 0; i < THREAD_POOL_SIZE; i++) {
+        _beginthreadex(NULL, 0, worker_thread_func, NULL, 0, NULL);
+    }
+
+    while (1) {
+        SOCKET ClientSocket = accept(ListenSocket, NULL, NULL);
+        if (ClientSocket == INVALID_SOCKET) continue;
+        
+        EnterCriticalSection(&queue_lock);
+        if (queue_count < QUEUE_SIZE) {
+            client_queue[queue_tail] = ClientSocket;
+            queue_tail = (queue_tail + 1) % QUEUE_SIZE;
+            queue_count++;
+            WakeConditionVariable(&queue_cond);
+        } else {
+            // Queue full, drop connection
+            closesocket(ClientSocket);
+        }
+        LeaveCriticalSection(&queue_lock);
+    }
 
     closesocket(ListenSocket);
     WSACleanup();
 }
+
 #else
 void launch_web_server(void) {
     printf(COLOR_RED "Error: The Web Server engine is currently configured for Windows (winsock2) only.\n" COLOR_RESET);
