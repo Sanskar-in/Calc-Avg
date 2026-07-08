@@ -20,7 +20,14 @@ This document chronicles the legendary evolution of the **Calc-Avg** project, hi
 
 ---
 
-## 🚀 Version 3.4: The Brand Expansion (LATEST)
+## 🗄️ Version 3.5: The Database Expansion (LATEST)
+**Status:** Released
+- **Native SQLite Integration**: The massive 8MB `sqlite3.c` amalgamation file was statically linked directly into `calc_avg.exe`. No external DLLs needed!
+- **Persistent Memory**: The C engine safely provisions a `database.sqlite` file upon boot, automatically recording every analytical, machine learning, calculus, and cryptographic operation into a relational `history` SQL table.
+- **REST History API**: Engineered a dedicated `/api/history` C HTTP endpoint that safely executes `SELECT` statements and dynamically constructs a massive JSON array payload in memory to serve back to the browser.
+- **Web Dashboard History Log**: Designed an ultra-modern, glassmorphism "History Log" tab in HTML/JS that asynchronously requests, parses, and injects the SQL database history natively into a formatted dashboard table.
+
+## 🚀 Version 3.4: The Brand Expansion
 **Status:** Released
 - **Native `.ICO` App Icon**: Embedded a custom, AI-designed high-tech neon logo directly into the Windows `calc_avg.exe` binary via the Resource Compiler (`MAINICON`).
 - **Web Server Routing**: Upgraded the `server.c` HTTP router to safely parse and transmit `image/png` MIME types for static assets.

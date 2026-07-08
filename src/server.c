@@ -19,6 +19,42 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <math.h>
+#include "../third_party/sqlite/sqlite3.h"
+
+sqlite3* global_db = NULL;
+
+void init_database() {
+    if (sqlite3_open("database.sqlite", &global_db)) {
+        printf(COLOR_RED "Error opening SQLite Database: %s\n" COLOR_RESET, sqlite3_errmsg(global_db));
+        return;
+    }
+    const char* sql = "CREATE TABLE IF NOT EXISTS history ("
+                      "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                      "timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, "
+                      "operation TEXT, "
+                      "input_data TEXT, "
+                      "result TEXT);";
+    char* err_msg = NULL;
+    if (sqlite3_exec(global_db, sql, 0, 0, &err_msg) != SQLITE_OK) {
+        printf(COLOR_RED "SQL Error: %s\n" COLOR_RESET, err_msg);
+        sqlite3_free(err_msg);
+    } else {
+        printf(COLOR_GREEN "Persistent SQLite Database Initialized.\n" COLOR_RESET);
+    }
+}
+
+void log_to_db(const char* operation, const char* input_data, const char* result) {
+    if (!global_db) return;
+    const char* sql = "INSERT INTO history (operation, input_data, result) VALUES (?, ?, ?);";
+    sqlite3_stmt* stmt;
+    if (sqlite3_prepare_v2(global_db, sql, -1, &stmt, NULL) == SQLITE_OK) {
+        sqlite3_bind_text(stmt, 1, operation, -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 2, input_data, -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 3, result, -1, SQLITE_TRANSIENT);
+        sqlite3_step(stmt);
+        sqlite3_finalize(stmt);
+    }
+}
 
 #ifdef _WIN32
 #include <winsock2.h>
@@ -372,11 +408,13 @@ void launch_web_server(void) {
         closesocket(ListenSocket); WSACleanup(); return;
     }
 
-    printf("\n" COLOR_CYAN COLOR_BOLD "--- Web Server: Calc-Avg Version 3.4 (The Brand Expansion) ---" COLOR_RESET "\n");
+    printf("\n" COLOR_CYAN COLOR_BOLD "--- Web Server: Calc-Avg Version 3.5 (The Database Expansion) ---" COLOR_RESET "\n");
     printf(COLOR_GREEN "Server is LIVE and listening on port %d" COLOR_RESET "\n", PORT);
     printf(COLOR_YELLOW "Open your Web Browser and navigate to: http://localhost:%d\n" COLOR_RESET, PORT);
     printf("Serving Web App from 'web-app/'. API Routes: /api/calculus, /api/crypto, ws://localhost:%d...\n", PORT);
     printf("Press Ctrl+C to stop the server and return to the terminal.\n\n");
+
+    init_database();
 
     SOCKET ClientSocket;
     char buffer[BUFFER_SIZE];
@@ -461,6 +499,7 @@ void launch_web_server(void) {
                         count, sum, mean, median, variance, std_dev, data_array_str);
                         
                     printf("API Request: Computed Stats for %d items.\n", count);
+                    log_to_db("Statistics", data_array_str, json_resp);
                     
                     char header[] = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n";
                     send(ClientSocket, header, strlen(header), 0);
@@ -516,6 +555,7 @@ void launch_web_server(void) {
                         n, m, b, data_array_str);
                         
                     printf("API Request: Computed AI Predictions for %d items.\n", n);
+                    log_to_db("Linear Regression", data_array_str, json_resp);
                     
                     char header[] = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n";
                     send(ClientSocket, header, strlen(header), 0);
@@ -572,6 +612,7 @@ void launch_web_server(void) {
                         count, window, prices_array_str, sma_array_str);
                         
                     printf("API Request: Computed Financial SMA (Window %d) for %d items.\n", window, count);
+                    log_to_db("Simple Moving Average", prices_array_str, json_resp);
                     
                     char header[] = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n";
                     send(ClientSocket, header, strlen(header), 0);
@@ -623,7 +664,8 @@ void launch_web_server(void) {
                         "{\"count\":%d, \"step\":%.4f, \"integral\":%.4f, \"original_data\":%s, \"derivatives\":%s}",
                         count, step, integral, orig_array_str, deriv_array_str);
                         
-                    printf("API Request: Computed Calculus for %d points.\n", count);
+                    printf("API Request: Computed Calculus for %d items.\n", count);
+                    log_to_db("Calculus", orig_array_str, json_resp);
                     
                     char header[] = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n";
                     send(ClientSocket, header, strlen(header), 0);
@@ -659,7 +701,8 @@ void launch_web_server(void) {
                     "{\"data\":\"%s\", \"hash\":\"%s\"}",
                     decoded, hash_hex);
                     
-                printf("API Request: Computed Crypto Hash (SHA-256).\n");
+                printf("API Request: Computed SHA-256 Hash.\n");
+                log_to_db("SHA-256 Hash", decoded, json_resp);
                 
                 char header[] = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n";
                 send(ClientSocket, header, strlen(header), 0);
@@ -690,12 +733,58 @@ void launch_web_server(void) {
                         orig_bytes, comp_bytes, ratio, compressed_hex);
                         
                     printf("API Request: Compressed Big Data Array.\n");
+                    log_to_db("RLE Compression", decoded, json_resp);
                     
                     char header[] = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n";
                     send(ClientSocket, header, strlen(header), 0);
                     send(ClientSocket, json_resp, strlen(json_resp), 0);
                 } else {
                     char err[] = "HTTP/1.1 400 Bad Request\r\nConnection: close\r\n\r\n{\"error\":\"No data to compress\"}";
+                    send(ClientSocket, err, strlen(err), 0);
+                }
+            }
+            // API Endpoint: /api/history (SQLite Database Query)
+            else if (strncmp(path, "/api/history", 12) == 0) {
+                if (global_db) {
+                    const char* sql = "SELECT id, timestamp, operation, input_data, result FROM history ORDER BY id DESC LIMIT 50;";
+                    sqlite3_stmt* stmt;
+                    
+                    char* json_resp = (char*)malloc(65536); // 64KB buffer
+                    strcpy(json_resp, "[");
+                    int first = 1;
+                    
+                    if (sqlite3_prepare_v2(global_db, sql, -1, &stmt, NULL) == SQLITE_OK) {
+                        while (sqlite3_step(stmt) == SQLITE_ROW) {
+                            if (!first) strcat(json_resp, ",");
+                            first = 0;
+                            
+                            int id = sqlite3_column_int(stmt, 0);
+                            const unsigned char* timestamp = sqlite3_column_text(stmt, 1);
+                            const unsigned char* operation = sqlite3_column_text(stmt, 2);
+                            const unsigned char* input_data = sqlite3_column_text(stmt, 3);
+                            // Avoid sending raw result JSON as a string if we can, but it is a string in DB. 
+                            // To embed it safely, we'd need to escape it, or since it's already JSON, just embed it!
+                            const unsigned char* result = sqlite3_column_text(stmt, 4);
+                            
+                            char row_json[8192];
+                            snprintf(row_json, sizeof(row_json), "{\"id\":%d,\"timestamp\":\"%s\",\"operation\":\"%s\",\"input_data\":\"%s\",\"result\":%s}", 
+                                     id, timestamp, operation, input_data, result);
+                                     
+                            if (strlen(json_resp) + strlen(row_json) < 65000) {
+                                strcat(json_resp, row_json);
+                            }
+                        }
+                        sqlite3_finalize(stmt);
+                    }
+                    strcat(json_resp, "]");
+                    
+                    printf("API Request: Fetched SQLite History Logs.\n");
+                    char header[] = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n";
+                    send(ClientSocket, header, strlen(header), 0);
+                    send(ClientSocket, json_resp, strlen(json_resp), 0);
+                    free(json_resp);
+                } else {
+                    char err[] = "HTTP/1.1 500 Internal Server Error\r\nConnection: close\r\n\r\n{\"error\":\"Database Not Initialized\"}";
                     send(ClientSocket, err, strlen(err), 0);
                 }
             }
