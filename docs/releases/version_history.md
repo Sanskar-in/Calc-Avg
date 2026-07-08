@@ -20,7 +20,14 @@ This document chronicles the legendary evolution of the **Calc-Avg** project, hi
 
 ---
 
-## 🗄️ Version 3.5: The Database Expansion (LATEST)
+## 🧠 Version 3.6: The Neural Network Expansion (LATEST)
+**Status:** Released
+- **Multi-Layer Perceptron (MLP)**: Engineered a complete Deep Learning Neural Network natively in C without external AI libraries.
+- **Asynchronous Training (`_beginthread`)**: Built a multi-threaded architecture allowing the C server to perform heavy gradient descent calculus (Forward/Backpropagation) over 10,000 epochs in the background without blocking the HTTP server.
+- **WebSocket Loss Streaming**: Injected dynamic Neural Network Cost Function tracking (`nn_loss`, `nn_epoch`) into the 64-bit WebSocket JSON blast.
+- **Real-Time Dashboard Chart**: Upgraded the Web Dashboard with an animated Chart.js layout that physically draws the AI's learning curve in real-time at 5Hz using the incoming WebSocket packets!
+
+## 🗄️ Version 3.5: The Database Expansion
 **Status:** Released
 - **Native SQLite Integration**: The massive 8MB `sqlite3.c` amalgamation file was statically linked directly into `calc_avg.exe`. No external DLLs needed!
 - **Persistent Memory**: The C engine safely provisions a `database.sqlite` file upon boot, automatically recording every analytical, machine learning, calculus, and cryptographic operation into a relational `history` SQL table.

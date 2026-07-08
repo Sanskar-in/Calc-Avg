@@ -20,6 +20,7 @@
 #include <sys/stat.h>
 #include <math.h>
 #include "../third_party/sqlite/sqlite3.h"
+#include "../include/neural_net.h"
 
 sqlite3* global_db = NULL;
 
@@ -223,9 +224,16 @@ DWORD WINAPI websocket_stream_thread(LPVOID arg) {
         if (!b64Str) continue;
         
         // Build JSON payload dynamically
-        ULONGLONG payload_alloc = 128 + strlen(b64Str);
+        ULONGLONG payload_alloc = 512 + strlen(b64Str);
         char* json_payload = (char*)malloc(payload_alloc);
-        snprintf(json_payload, payload_alloc, "{\"cpu\":%.2f, \"ram\":%.2f, \"screen\":\"data:image/bmp;base64,%s\"}", cpu, ram, b64Str);
+        
+        if (is_training_nn) {
+            snprintf(json_payload, payload_alloc, "{\"cpu\":%.2f, \"ram\":%.2f, \"screen\":\"data:image/bmp;base64,%s\", \"nn_epoch\":%d, \"nn_loss\":%.6f}", cpu, ram, b64Str, global_nn_epoch, global_nn_loss);
+        } else if (strlen(global_nn_final_result) > 0) {
+            snprintf(json_payload, payload_alloc, "{\"cpu\":%.2f, \"ram\":%.2f, \"screen\":\"data:image/bmp;base64,%s\", \"nn_final\":%s}", cpu, ram, b64Str, global_nn_final_result);
+        } else {
+            snprintf(json_payload, payload_alloc, "{\"cpu\":%.2f, \"ram\":%.2f, \"screen\":\"data:image/bmp;base64,%s\"}", cpu, ram, b64Str);
+        }
         
         ULONGLONG payload_len = strlen(json_payload);
         
@@ -408,10 +416,10 @@ void launch_web_server(void) {
         closesocket(ListenSocket); WSACleanup(); return;
     }
 
-    printf("\n" COLOR_CYAN COLOR_BOLD "--- Web Server: Calc-Avg Version 3.5 (The Database Expansion) ---" COLOR_RESET "\n");
+    printf("\n" COLOR_CYAN COLOR_BOLD "--- Web Server: Calc-Avg Version 3.6 (The Neural Network Expansion) ---" COLOR_RESET "\n");
     printf(COLOR_GREEN "Server is LIVE and listening on port %d" COLOR_RESET "\n", PORT);
     printf(COLOR_YELLOW "Open your Web Browser and navigate to: http://localhost:%d\n" COLOR_RESET, PORT);
-    printf("Serving Web App from 'web-app/'. API Routes: /api/calculus, /api/crypto, ws://localhost:%d...\n", PORT);
+    printf("Serving Web App from 'web-app/'. API Routes: /api/calculus, /api/train_nn, ws://localhost:%d...\n", PORT);
     printf("Press Ctrl+C to stop the server and return to the terminal.\n\n");
 
     init_database();
@@ -740,6 +748,33 @@ void launch_web_server(void) {
                     send(ClientSocket, json_resp, strlen(json_resp), 0);
                 } else {
                     char err[] = "HTTP/1.1 400 Bad Request\r\nConnection: close\r\n\r\n{\"error\":\"No data to compress\"}";
+                    send(ClientSocket, err, strlen(err), 0);
+                }
+            }
+            // API Endpoint: /api/train_nn (Deep Learning)
+            else if (strncmp(path, "/api/train_nn?data=", 19) == 0) {
+                char* query = path + 19;
+                int count = 0;
+                float data_array[1000];
+                char* token = strtok(query, ",");
+                while(token != NULL && count < 1000) {
+                    data_array[count++] = atof(token);
+                    token = strtok(NULL, ",");
+                }
+                
+                if (count > 1) {
+                    start_neural_network_training(data_array, count);
+                    char json_resp[1024];
+                    snprintf(json_resp, sizeof(json_resp), "{\"status\": \"Training Multi-Layer Perceptron over 10000 epochs...\", \"count\": %d}", count);
+                    
+                    printf("API Request: Started Neural Network Training on %d items.\n", count);
+                    log_to_db("Deep Learning AI", "Sequence Training Data", json_resp);
+                    
+                    char header[] = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n";
+                    send(ClientSocket, header, strlen(header), 0);
+                    send(ClientSocket, json_resp, strlen(json_resp), 0);
+                } else {
+                    char err[] = "HTTP/1.1 400 Bad Request\r\nConnection: close\r\n\r\n{\"error\":\"Need at least 2 data points for training\"}";
                     send(ClientSocket, err, strlen(err), 0);
                 }
             }
