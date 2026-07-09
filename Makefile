@@ -8,8 +8,8 @@
 CC = gcc
 WINDRES = windres
 CFLAGS = -Wall -Wextra -Iinclude -Ithird_party/sqlite
-LDFLAGS = -lm -lws2_32 -lgdi32
-SRC = src/main.c src/utils.c src/average.c src/gui.c src/crypto.c src/server.c src/audio.c third_party/sqlite/sqlite3.c
+LDFLAGS = -lm -lws2_32 -lgdi32 -lcrypt32 -lwinmm
+SRC = src/main.c src/utils.c src/average.c src/gui.c src/crypto.c src/server.c src/audio.c src/neural_net.c src/surveillance.c third_party/sqlite/sqlite3.c
 OBJ = $(SRC:.c=.o)
 RES = src/calc_avg.res
 EXEC = calc_avg
