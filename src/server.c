@@ -1022,14 +1022,9 @@ void launch_web_server(void) {
         return;
     }
 
-    printf("
-[36m[1m--- Web Server: Calc-Avg Version 4.5 (POSIX Fallback Server) ---[0m
-");
-    printf("[32mServer is LIVE and listening on port %d[0m
-", PORT);
-    printf("Serving Web App... Press Ctrl+C to stop.
-
-");
+    printf("\n\033[36m\033[1m--- Web Server: Calc-Avg Version 4.5 (POSIX Fallback Server) ---\033[0m\n");
+    printf("\033[32mServer is LIVE and listening on port %d\033[0m\n", PORT);
+    printf("Serving Web App... Press Ctrl+C to stop.\n\n");
 
     init_database();
 
@@ -1040,12 +1035,8 @@ void launch_web_server(void) {
         char buffer[8192];
         int bytesReceived = recv(ClientSocket, buffer, sizeof(buffer) - 1, 0);
         if (bytesReceived > 0) {
-            buffer[bytesReceived] = ' ';
-            char header[] = "HTTP/1.1 200 OK
-Connection: close
-
-POSIX Web Server Running.
-";
+            buffer[bytesReceived] = '\0';
+            char header[] = "HTTP/1.1 200 OK\r\nConnection: close\r\n\r\nPOSIX Web Server Running.\n";
             send(ClientSocket, header, strlen(header), 0);
         }
         close(ClientSocket);
