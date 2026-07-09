@@ -3,8 +3,8 @@
 MAINICON ICON "icon.ico"
 
 1 VERSIONINFO
-FILEVERSION     3,10,0,0
-PRODUCTVERSION  3,10,0,0
+FILEVERSION     4,5,0,0
+PRODUCTVERSION  4,5,0,0
 FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
 FILEFLAGS       0x0L
 FILEOS          VOS_NT_WINDOWS32
@@ -16,13 +16,13 @@ BEGIN
     BLOCK "040904E4"
     BEGIN
       VALUE "CompanyName", "Sanskar"
-      VALUE "FileDescription", "Calc-Avg - Advanced C Mathematical & Surveillance Engine (V3.10 The Global Surveillance Expansion)"
-      VALUE "FileVersion", "3.10.0.0"
+      VALUE "FileDescription", "Calc-Avg - Advanced C Mathematical & Surveillance Engine (V4.5 The Cross-Platform Expansion)"
+      VALUE "FileVersion", "4.5.0.0"
       VALUE "InternalName", "calc_avg"
       VALUE "LegalCopyright", "(c) Copyright Sanskar. All rights reserved."
       VALUE "OriginalFilename", "calc_avg.exe"
       VALUE "ProductName", "Calc-Avg Engine"
-      VALUE "ProductVersion", "3.10.0.0"
+      VALUE "ProductVersion", "4.5.0.0"
     END
   END
   BLOCK "VarFileInfo"
