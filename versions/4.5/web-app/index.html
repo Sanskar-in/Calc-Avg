@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calc-Avg V3.4 | Web Edition</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div class="glass-container">
+        <header class="app-header">
+            <div class="logo-wrapper">
+                <img src="logo.png" alt="Calc-Avg Logo" class="app-logo">
+                <div class="titles">
+                    <h1>Calc-Avg <span class="version-badge">v3.4</span></h1>
+                    <p class="subtitle">Advanced C Mathematical & Surveillance Engine</p>
+                </div>
+            </div>
+            <nav class="tabs">
+                <button class="tab-btn active" data-tab="tab-stats">Statistics</button>
+                <button class="tab-btn" data-tab="tab-ai">Linear Predict</button>
+                <button class="tab-btn" data-tab="tab-nn">Deep Learning AI</button>
+                <button class="tab-btn" data-tab="tab-sma">Finance SMA</button>
+                <button class="tab-btn" data-tab="tab-calculus">Calculus</button>
+                <button class="tab-btn" data-tab="tab-crypto">Crypto</button>
+                <button class="tab-btn" data-tab="tab-compress">Data Zip</button>
+                <button class="tab-btn" data-tab="tab-csv">Big Data CSV</button>
+                <button class="tab-btn" data-tab="tab-stream">🔴 Live Stream</button>
+                <button class="tab-btn" data-tab="tab-surveillance">👁️ Surveillance</button>
+                <button class="tab-btn" data-tab="tab-history">📜 History Log</button>
+            </nav>
+        </header>
+
+        <main>
+            <!-- Tab 9: Global Surveillance -->
+            <section id="tab-surveillance" class="tab-content">
+                <div class="surveillance-container">
+                    <div class="keystroke-panel">
+                        <h3><span class="icon">⌨️</span> Live Keystroke Interception</h3>
+                        <div class="hacker-terminal" id="keyTerminal">
+                            <span class="blinking-cursor">_</span>
+                        </div>
+                    </div>
+                    <div class="mouse-panel">
+                        <h3><span class="icon">🖱️</span> Global Mouse Tracking</h3>
+                        <canvas id="mouseCanvas" width="400" height="300"></canvas>
+                        <div class="mouse-coords">X: <span id="mouseX">0</span> | Y: <span id="mouseY">0</span></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 8: History Log -->
+            <section id="tab-history" class="tab-content">
+                <div class="table-wrapper">
+                    <table class="history-table" id="historyTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Timestamp</th>
+                                <th>Operation</th>
+                                <th>Input Data</th>
+                                <th>Result / Payload</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyBody">
+                            <tr><td colspan="5" style="text-align: center;">Fetching Database History...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Tab 7: WebSocket Stream -->
+            <section id="tab-stream" class="tab-content">
+                <div class="data-form" style="text-align: center;">
+                    <button id="start-stream-btn" class="glow-btn ai-btn">Connect Live Remote Desktop</button>
+                    <button id="stop-stream-btn" class="glow-btn" style="background: rgba(244, 63, 94, 0.2); border-color: #f43f5e; display: none;">Disconnect RDP</button>
+                </div>
+                <div id="stream-results" class="results-container hidden">
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="stat-title">Status</div><div class="stat-value" id="ws-status" style="color: #10b981">Connected (5Hz)</div></div>
+                        <div class="stat-card"><div class="stat-title">Live CPU %</div><div class="stat-value" id="ws-cpu" style="color: #f43f5e">0.00%</div></div>
+                        <div class="stat-card"><div class="stat-title">Live RAM %</div><div class="stat-value" id="ws-ram" style="color: #38bdf8">0.00%</div></div>
+                    </div>
+                    <div class="rdp-wrapper" style="text-align: center; margin-top: 20px; border: 2px solid rgba(255,255,255,0.1); border-radius: 12px; overflow: hidden; background: #000;">
+                        <img id="ws-screen" style="max-width: 100%; height: auto; display: block;" alt="Live C Engine RDP Screen">
+                    </div>
+                    <div class="chart-wrapper" style="margin-top: 20px;">
+                        <canvas id="streamChart"></canvas>
+                    </div>
+                    
+                    <div class="audio-wrapper" style="margin-top: 20px; text-align: center;">
+                        <h4 style="color: #a78bfa; margin-bottom: 10px;">Live Voice Surveillance (Microphone Feed)</h4>
+                        <canvas id="audioVisualizer" width="600" height="100" style="width: 100%; max-width: 600px; height: 100px; background: rgba(0,0,0,0.5); border: 1px solid rgba(167, 139, 250, 0.3); border-radius: 8px;"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 1: Stats -->
+            <section id="tab-stats" class="tab-content active">
+                <form id="stats-form" class="data-form">
+                    <label>Enter Dataset (comma-separated):</label>
+                    <input type="text" id="stats-data" placeholder="e.g. 85, 92, 78, 90, 88" required autocomplete="off">
+                    <button type="submit" class="glow-btn">Calculate Core Stats</button>
+                </form>
+                <div id="stats-results" class="results-container hidden">
+                    <div class="stats-grid" id="stats-grid-container"></div>
+                    <div class="chart-wrapper">
+                        <canvas id="statsChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 2: Predictive AI -->
+            <section id="tab-ai" class="tab-content">
+                <form id="ml-form" class="data-form">
+                    <label>Enter Historical Data (comma-separated):</label>
+                    <input type="text" id="ml-data" placeholder="e.g. 10, 15, 20, 25, 30" required autocomplete="off">
+                    <label>Future Periods to Predict:</label>
+                    <input type="number" id="ml-future" value="3" min="1" max="50" required>
+                    <button type="submit" class="glow-btn ai-btn">Train AI & Forecast</button>
+                </form>
+                <div id="ml-results" class="results-container hidden">
+                    <div id="ml-equation" class="equation-box"></div>
+                    <div class="chart-wrapper">
+                        <canvas id="mlChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 3: Finance SMA -->
+            <section id="tab-finance" class="tab-content">
+                <form id="sma-form" class="data-form">
+                    <label>Enter Asset Prices (comma-separated):</label>
+                    <input type="text" id="sma-data" placeholder="e.g. 150, 152, 149, 155, 160, 158" required autocomplete="off">
+                    <label>Moving Average Window (Days):</label>
+                    <input type="number" id="sma-window" value="3" min="2" max="100" required>
+                    <button type="submit" class="glow-btn finance-btn">Calculate SMA</button>
+                </form>
+                <div id="sma-results" class="results-container hidden">
+                    <div class="chart-wrapper">
+                        <canvas id="smaChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 9: Big Data CSV -->
+            <section id="tab-csv" class="tab-content">
+                <div class="data-form" style="text-align: center;">
+                    <h3 style="color: #38bdf8; margin-bottom: 15px;">Upload Massive CSV Data</h3>
+                    <p style="color: #94a3b8; font-size: 0.9em; margin-bottom: 20px;">Upload a .csv file containing millions of numbers. The C engine will parse it completely in RAM!</p>
+                    
+                    <div id="drop-zone" class="drop-zone">
+                        <span class="drop-icon">📄</span>
+                        <p>Drag & Drop your .csv file here</p>
+                        <p style="font-size: 0.8em; color: #64748b;">or click to browse</p>
+                        <input type="file" id="csv-file" accept=".csv" style="display: none;">
+                    </div>
+                </div>
+                
+                <div id="csv-results" class="results-container hidden" style="margin-top: 20px;">
+                    <h3 style="color: #10b981; margin-bottom: 10px;">C Engine Output:</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="stat-title">Rows Parsed</div><div class="stat-value" id="csv-count" style="color: #a78bfa">0</div></div>
+                        <div class="stat-card"><div class="stat-title">Global Average</div><div class="stat-value" id="csv-avg" style="color: #fbbf24">0.00</div></div>
+                        <div class="stat-card"><div class="stat-title">Minimum Val</div><div class="stat-value" id="csv-min" style="color: #f43f5e">0.00</div></div>
+                        <div class="stat-card"><div class="stat-title">Maximum Val</div><div class="stat-value" id="csv-max" style="color: #38bdf8">0.00</div></div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+        
+        <footer class="app-footer">
+            <p>&copy; Copyright Sanskar. All rights reserved. <br> Powered by Client-Side WebAssembly & JS <br>
+            <a href="https://github.com/Sanskar-in/Calc-Avg" target="_blank">View Project on GitHub</a></p>
+        </footer>
+    </main>
+
+    <!-- JS Math Engine -->
+    <script src="script.js"></script>
+</body>
+</html>

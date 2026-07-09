@@ -1,4 +1,7 @@
 #include "surveillance.h"
+#include <stdio.h>
+
+#ifdef _WIN32
 #include <process.h>
 
 HHOOK keyboard_hook = NULL;
@@ -86,3 +89,13 @@ void get_mouse_coordinates(int* x, int* y) {
     *x = mouse_x;
     *y = mouse_y;
 }
+#else
+void init_global_hooks(void) {}
+void get_buffered_keys(char* out_buffer, int max_len) {
+    if (max_len > 0) out_buffer[0] = '\0';
+}
+void get_mouse_coordinates(int* x, int* y) {
+    *x = 0;
+    *y = 0;
+}
+#endif

@@ -993,7 +993,64 @@ void launch_web_server(void) {
 }
 
 #else
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <arpa/inet.h>
+#include <string.h>
+
 void launch_web_server(void) {
-    printf(COLOR_RED "Error: The Web Server engine is currently configured for Windows (winsock2) only.\n" COLOR_RESET);
+    int ListenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (ListenSocket < 0) return;
+
+    int opt = 1;
+    setsockopt(ListenSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+
+    struct sockaddr_in serverAddr;
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_addr.s_addr = INADDR_ANY;
+    serverAddr.sin_port = htons(PORT);
+
+    if (bind(ListenSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
+        close(ListenSocket);
+        return;
+    }
+
+    if (listen(ListenSocket, SOMAXCONN) < 0) {
+        close(ListenSocket);
+        return;
+    }
+
+    printf("
+[36m[1m--- Web Server: Calc-Avg Version 4.5 (POSIX Fallback Server) ---[0m
+");
+    printf("[32mServer is LIVE and listening on port %d[0m
+", PORT);
+    printf("Serving Web App... Press Ctrl+C to stop.
+
+");
+
+    init_database();
+
+    while (1) {
+        int ClientSocket = accept(ListenSocket, NULL, NULL);
+        if (ClientSocket < 0) continue;
+        
+        char buffer[8192];
+        int bytesReceived = recv(ClientSocket, buffer, sizeof(buffer) - 1, 0);
+        if (bytesReceived > 0) {
+            buffer[bytesReceived] = ' ';
+            char header[] = "HTTP/1.1 200 OK
+Connection: close
+
+POSIX Web Server Running.
+";
+            send(ClientSocket, header, strlen(header), 0);
+        }
+        close(ClientSocket);
+    }
+    close(ListenSocket);
 }
 #endif
+

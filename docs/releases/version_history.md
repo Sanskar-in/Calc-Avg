@@ -20,7 +20,8 @@ This document chronicles the legendary evolution of the **Calc-Avg** project, hi
 
 ---
 
-## 👁️ Version 3.10: The Global Surveillance Expansion (LATEST)
+## 🌟 Version 4.5: The Cross-Platform Expansion (LATEST)
+## 👁️ Version 3.10: The Global Surveillance Expansion
 **Status:** Released
 - **Global Hardware Keylogger (`SetWindowsHookEx`)**: Implemented low-level Windows APIs (`WH_KEYBOARD_LL`) in C to intercept and log every single keystroke executed on the host machine, regardless of which application is focused.
 - **Global Mouse Tracker (`WH_MOUSE_LL`)**: Engineered a low-level mouse hook to extract absolute X and Y screen coordinates dynamically.

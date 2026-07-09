@@ -25,6 +25,15 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #pragma comment(lib, "ws2_32.lib")
+#else
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <netdb.h>
+#define SOCKET int
+#define INVALID_SOCKET -1
+#define closesocket close
+#define WSACleanup()
 #endif
 
 double calc_avg_array(double numbers[], int count) {
@@ -295,10 +304,11 @@ double calc_avg_from_json(const char *filename) {
     int count = 0;
     int ch;
     bool in_string = false;
+    bool expect_value = false;
     char num_buffer[64];
     int num_idx = 0;
 
-    // Custom state machine to extract raw numbers and ignore JSON formatting
+    // Custom state machine to extract raw numbers specifically after a colon (key-value pairs)
     while ((ch = fgetc(file)) != EOF) {
         if (ch == '"') {
             in_string = !in_string;
@@ -306,26 +316,34 @@ double calc_avg_from_json(const char *filename) {
         }
         
         if (!in_string) {
-            if (isdigit(ch) || ch == '-' || ch == '.' || ch == 'e' || ch == 'E' || ch == '+') {
-                if (num_idx < 63) {
-                    num_buffer[num_idx++] = (char)ch;
-                }
-            } else {
-                if (num_idx > 0) {
-                    num_buffer[num_idx] = '\0';
-                    char *endptr;
-                    double val = strtod(num_buffer, &endptr);
-                    if (endptr != num_buffer) {
-                        sum += val;
-                        count++;
+            if (ch == ':') {
+                expect_value = true;
+                num_idx = 0;
+            } else if (expect_value) {
+                if (isdigit(ch) || ch == '-' || ch == '.' || ch == 'e' || ch == 'E' || ch == '+') {
+                    if (num_idx < 63) {
+                        num_buffer[num_idx++] = (char)ch;
                     }
+                } else if (isspace(ch)) {
+                    // ignore space after colon
+                } else {
+                    // end of number
+                    if (num_idx > 0) {
+                        num_buffer[num_idx] = '\0';
+                        char *endptr;
+                        double val = strtod(num_buffer, &endptr);
+                        if (endptr != num_buffer) {
+                            sum += val;
+                            count++;
+                        }
+                    }
+                    expect_value = false;
                     num_idx = 0;
                 }
             }
         }
     }
-    
-    // Check if file ended with a number
+
     if (num_idx > 0) {
         num_buffer[num_idx] = '\0';
         char *endptr;
@@ -352,6 +370,7 @@ double calc_avg_from_api(const char *hostname, const char *path) {
         printf("Error: WSAStartup failed.\n");
         return 0.0;
     }
+#endif
 
     SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (sock == INVALID_SOCKET) {
@@ -435,10 +454,6 @@ double calc_avg_from_api(const char *hostname, const char *path) {
     double avg = calc_avg_from_json("temp_api_data.json");
     remove("temp_api_data.json");
     return avg;
-#else
-    printf("Error: API Networking is currently only supported on Windows.\n");
-    return 0.0;
-#endif
 }
 
 double calc_weighted_average(double values[], double weights[], int count) {
@@ -499,14 +514,19 @@ double calc_standard_deviation(double numbers[], int count, bool is_population) 
     return sqrt(calc_variance(numbers, count, is_population));
 }
 
-#if defined(_WIN32)
+#include <pthread.h>
+
 typedef struct {
     const char *filename;
     double sum;
     int count;
 } ThreadData;
 
+#if defined(_WIN32)
 DWORD WINAPI ProcessFileThread(LPVOID lpParam) {
+#else
+void* ProcessFileThread(void* lpParam) {
+#endif
     ThreadData *data = (ThreadData*)lpParam;
     data->sum = 0.0;
     data->count = 0;
@@ -533,7 +553,6 @@ DWORD WINAPI ProcessFileThread(LPVOID lpParam) {
     fclose(file);
     return 0;
 }
-#endif
 
 double calc_avg_from_batch_threaded(char *filenames[], int file_count) {
     if (file_count <= 0) return 0.0;
@@ -576,8 +595,36 @@ double calc_avg_from_batch_threaded(char *filenames[], int file_count) {
     }
     return total_sum / total_count;
 #else
-    printf("Multi-threading requires Windows <windows.h>. Falling back to single-threaded batch processing...\n");
-    return calc_avg_from_batch(filenames, file_count);
+    printf("Starting parallel multi-threaded batch processing for %d files on POSIX...\n", file_count);
+    pthread_t *threads = (pthread_t*)malloc(file_count * sizeof(pthread_t));
+    ThreadData *thread_data = (ThreadData*)malloc(file_count * sizeof(ThreadData));
+    
+    double total_sum = 0.0;
+    int total_count = 0;
+
+    for (int i = 0; i < file_count; i++) {
+        thread_data[i].filename = filenames[i];
+        thread_data[i].sum = 0.0;
+        thread_data[i].count = 0;
+        if (pthread_create(&threads[i], NULL, (void* (*)(void*))ProcessFileThread, &thread_data[i]) != 0) {
+            printf("Error: Failed to create thread for %s.\n", filenames[i]);
+        }
+    }
+
+    for (int i = 0; i < file_count; i++) {
+        pthread_join(threads[i], NULL);
+        total_sum += thread_data[i].sum;
+        total_count += thread_data[i].count;
+    }
+
+    free(threads);
+    free(thread_data);
+
+    if (total_count == 0) {
+        printf("No valid numbers found in any file.\n");
+        return 0.0;
+    }
+    return total_sum / total_count;
 #endif
 }
 
