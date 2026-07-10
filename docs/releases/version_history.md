@@ -20,7 +20,13 @@ This document chronicles the legendary evolution of the **Calc-Avg** project, hi
 
 ---
 
-## 🌟 Version 4.5: The Cross-Platform Expansion (LATEST)
+## 🌟 Version 4.6: The Binary Streaming Expansion (LATEST)
+**Status:** Released
+- **High-Performance Binary WebSocket Streaming**: Transformed the WebSocket engine to use binary data formatting (Opcode `0x82`). Removed `CryptBinaryToStringA` dependencies, neutralizing the base64 encoding/decoding overhead.
+- **60 FPS Video Streaming & Surveillance**: Bumped up the core loop from 5Hz (`Sleep(200)`) to 60Hz (`Sleep(16)`). Real-time client-side rendering implemented directly onto HTML5 `<canvas>` via `ArrayBuffer` handling.
+- **Walkie-Talkie Two-Way Audio Communication**: Capture live microphone input in the browser using `getUserMedia` and `ScriptProcessor`. Transmits audio buffers seamlessly to the C server. Win32 `waveOut` audio playback architecture seamlessly decodes and outputs audio chunk streams.
+
+## 🌟 Version 4.5: The Cross-Platform Expansion
 ## 👁️ Version 3.10: The Global Surveillance Expansion
 **Status:** Released
 - **Global Hardware Keylogger (`SetWindowsHookEx`)**: Implemented low-level Windows APIs (`WH_KEYBOARD_LL`) in C to intercept and log every single keystroke executed on the host machine, regardless of which application is focused.

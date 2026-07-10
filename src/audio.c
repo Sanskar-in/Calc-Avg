@@ -78,6 +78,48 @@ void start_microphone_stream_thread() {
     printf(COLOR_GREEN "Live Microphone Surveillance Thread Initialized (8000Hz 8-Bit Mono @ 5Hz)." COLOR_RESET "\n");
 }
 
+
+// Audio Player Global State
+HWAVEOUT hWaveOut = NULL;
+
+void init_audio_player() {
+    WAVEFORMATEX wfx;
+    wfx.wFormatTag = WAVE_FORMAT_PCM;
+    wfx.nChannels = 1;
+    wfx.nSamplesPerSec = 8000;
+    wfx.wBitsPerSample = 8;
+    wfx.nBlockAlign = (wfx.nChannels * wfx.wBitsPerSample) / 8;
+    wfx.nAvgBytesPerSec = wfx.nSamplesPerSec * wfx.nBlockAlign;
+    wfx.cbSize = 0;
+    
+    if (waveOutOpen(&hWaveOut, WAVE_MAPPER, &wfx, 0, 0, CALLBACK_NULL) != MMSYSERR_NOERROR) {
+        printf("Failed to open audio output.\n");
+    }
+}
+
+void play_audio_chunk(const unsigned char* data, int len) {
+    if (!hWaveOut) return;
+    
+    WAVEHDR* wh = (WAVEHDR*)malloc(sizeof(WAVEHDR));
+    wh->lpData = (LPSTR)malloc(len);
+    memcpy(wh->lpData, data, len);
+    wh->dwBufferLength = len;
+    wh->dwBytesRecorded = 0;
+    wh->dwUser = 0;
+    wh->dwFlags = 0;
+    wh->dwLoops = 0;
+    
+    waveOutPrepareHeader(hWaveOut, wh, sizeof(WAVEHDR));
+    waveOutWrite(hWaveOut, wh, sizeof(WAVEHDR));
+}
+
+void cleanup_audio_player() {
+    if (hWaveOut) {
+        waveOutClose(hWaveOut);
+        hWaveOut = NULL;
+    }
+}
+
 char* get_latest_mic_base64() {
     static char output[8192];
     EnterCriticalSection(&mic_cs);
@@ -132,5 +174,13 @@ void play_data_sonification(double data_points[], int count) {
 }
 
 void start_microphone_stream_thread() {}
+
+void init_audio_player() {}
+void play_audio_chunk(const unsigned char* data, int len) {
+    (void)data;
+    (void)len;
+}
+void cleanup_audio_player() {}
+
 char* get_latest_mic_base64() { return ""; }
 #endif

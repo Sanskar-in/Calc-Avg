@@ -425,12 +425,16 @@ document.addEventListener('DOMContentLoaded', () => {
         wsStatus.style.color = "#fbbf24"; // yellow
         
         ws = new WebSocket(`ws://${window.location.host}`);
+        ws.binaryType = 'arraybuffer';
+        ws.binaryType = 'arraybuffer';
         
         ws.onopen = () => {
             wsStatus.innerText = "Connected (5Hz RDP)";
             wsStatus.innerText = "Connected & Streaming";
             wsStatus.style.color = "#10b981"; // emerald
             startBtn.style.display = "none";
+            document.getElementById('walkie-talkie-btn').style.display = "inline-block";
+            document.getElementById('walkie-talkie-btn').style.display = "inline-block";
             stopBtn.style.display = "inline-block";
             
             // Init Chart
@@ -459,7 +463,15 @@ document.addEventListener('DOMContentLoaded', () => {
         
         ws.onmessage = (event) => {
             try {
-                const data = JSON.parse(event.data);
+                
+                if (event.data instanceof ArrayBuffer) {
+                    const decoder = new TextDecoder('utf-8');
+                    const text = decoder.decode(event.data);
+                    var data = JSON.parse(text);
+                } else {
+                    var data = JSON.parse(event.data);
+                }
+
                 
                 // Update Screen
                 wsScreen.src = data.screen;
@@ -586,6 +598,8 @@ document.addEventListener('DOMContentLoaded', () => {
             wsStatus.innerText = "Disconnected";
             wsStatus.style.color = "#94a3b8"; // slate
             startBtn.style.display = "inline-block";
+            document.getElementById('walkie-talkie-btn').style.display = "none";
+            document.getElementById('walkie-talkie-btn').style.display = "none";
             stopBtn.style.display = "none";
             ws = null;
         };
@@ -598,6 +612,118 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     // BIG DATA CSV UPLOAD (TAB 9)
     // ==========================================
+    
+    // Walkie-Talkie Logic
+    let walkieStream = null;
+    let walkieRecorder = null;
+
+    window.startWalkieTalkie = async function() {
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+            alert("Connect to the server first.");
+            return;
+        }
+        try {
+            walkieStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+            // Ideally we want 8000Hz 8-bit Mono to match the C engine. MediaRecorder gives us WebM/Opus or similar.
+            // For a perfectly integrated solution, we would capture raw PCM via ScriptProcessor/AudioWorklet and send it.
+            // To keep things simple and matching the C side's new `play_audio_chunk`, we'll send a dummy buffer 
+            // or the raw Float32 array mapped to 8-bit.
+            
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            const context = new AudioContext({ sampleRate: 8000 });
+            const source = context.createMediaStreamSource(walkieStream);
+            const processor = context.createScriptProcessor(1024, 1, 1);
+            
+            source.connect(processor);
+            processor.connect(context.destination);
+            
+            processor.onaudioprocess = function(e) {
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    const floatData = e.inputBuffer.getChannelData(0);
+                    const pcm8 = new Uint8Array(floatData.length);
+                    for (let i = 0; i < floatData.length; i++) {
+                        let val = Math.max(-1, Math.min(1, floatData[i]));
+                        pcm8[i] = Math.round(val * 127 + 128);
+                    }
+                    // Send as Binary (Opcode 0x82 will be used if ws.binaryType is arraybuffer/blob and we send a TypedArray)
+                    ws.send(pcm8);
+                }
+            };
+            
+            walkieRecorder = processor;
+            
+        } catch (e) {
+            console.error("Walkie-Talkie Error:", e);
+        }
+    };
+
+    window.stopWalkieTalkie = function() {
+        if (walkieRecorder) {
+            walkieRecorder.disconnect();
+            walkieRecorder = null;
+        }
+        if (walkieStream) {
+            walkieStream.getTracks().forEach(t => t.stop());
+            walkieStream = null;
+        }
+    };
+
+    
+    // Walkie-Talkie Logic
+    let walkieStream = null;
+    let walkieRecorder = null;
+
+    window.startWalkieTalkie = async function() {
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+            alert("Connect to the server first.");
+            return;
+        }
+        try {
+            walkieStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+            // Ideally we want 8000Hz 8-bit Mono to match the C engine. MediaRecorder gives us WebM/Opus or similar.
+            // For a perfectly integrated solution, we would capture raw PCM via ScriptProcessor/AudioWorklet and send it.
+            // To keep things simple and matching the C side's new `play_audio_chunk`, we'll send a dummy buffer 
+            // or the raw Float32 array mapped to 8-bit.
+            
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            const context = new AudioContext({ sampleRate: 8000 });
+            const source = context.createMediaStreamSource(walkieStream);
+            const processor = context.createScriptProcessor(1024, 1, 1);
+            
+            source.connect(processor);
+            processor.connect(context.destination);
+            
+            processor.onaudioprocess = function(e) {
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    const floatData = e.inputBuffer.getChannelData(0);
+                    const pcm8 = new Uint8Array(floatData.length);
+                    for (let i = 0; i < floatData.length; i++) {
+                        let val = Math.max(-1, Math.min(1, floatData[i]));
+                        pcm8[i] = Math.round(val * 127 + 128);
+                    }
+                    // Send as Binary (Opcode 0x82 will be used if ws.binaryType is arraybuffer/blob and we send a TypedArray)
+                    ws.send(pcm8);
+                }
+            };
+            
+            walkieRecorder = processor;
+            
+        } catch (e) {
+            console.error("Walkie-Talkie Error:", e);
+        }
+    };
+
+    window.stopWalkieTalkie = function() {
+        if (walkieRecorder) {
+            walkieRecorder.disconnect();
+            walkieRecorder = null;
+        }
+        if (walkieStream) {
+            walkieStream.getTracks().forEach(t => t.stop());
+            walkieStream = null;
+        }
+    };
+
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('csv-file');
     const csvResults = document.getElementById('csv-results');
@@ -647,7 +773,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('file', file);
 
         // UI Feedback
-        dropZone.innerHTML = `<span class="drop-icon">⏳</span><p>Uploading and Parsing ${file.name}...</p><p style="color: #fbbf24">Processing in C RAM...</p>`;
+        dropZone.innerHTML = `<span class="drop-icon">â³</span><p>Uploading and Parsing ${file.name}...</p><p style="color: #fbbf24">Processing in C RAM...</p>`;
         
         try {
             const response = await fetch('/api/upload_csv', {
@@ -657,7 +783,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             
             if (data.status === 'success') {
-                dropZone.innerHTML = `<span class="drop-icon" style="color: #10b981">✅</span><p>Successfully processed ${file.name}</p><p style="font-size: 0.8em; color: #64748b;">Click to upload another</p>`;
+                dropZone.innerHTML = `<span class="drop-icon" style="color: #10b981">â</span><p>Successfully processed ${file.name}</p><p style="font-size: 0.8em; color: #64748b;">Click to upload another</p>`;
                 
                 csvResults.classList.remove('hidden');
                 document.getElementById('csv-count').innerText = data.count.toLocaleString();
@@ -670,9 +796,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error('Error:', error);
-            dropZone.innerHTML = `<span class="drop-icon" style="color: #f43f5e">❌</span><p>Error processing file</p><p style="font-size: 0.8em; color: #f43f5e;">${error.message}</p>`;
+            dropZone.innerHTML = `<span class="drop-icon" style="color: #f43f5e">â</span><p>Error processing file</p><p style="font-size: 0.8em; color: #f43f5e;">${error.message}</p>`;
             setTimeout(() => {
-                dropZone.innerHTML = `<span class="drop-icon">📄</span><p>Drag & Drop your .csv file here</p><p style="font-size: 0.8em; color: #64748b;">or click to browse</p>`;
+                dropZone.innerHTML = `<span class="drop-icon">ð</span><p>Drag & Drop your .csv file here</p><p style="font-size: 0.8em; color: #64748b;">or click to browse</p>`;
             }, 3000);
         }
     }

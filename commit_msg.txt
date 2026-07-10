@@ -1,0 +1,25 @@
+Version 4.6 (The Binary Streaming Expansion) - 60 FPS WebSockets, Full-Duplex Audio & Win32 Integration
+
+This is a massive architectural upgrade to the Calc-Avg engine, transforming the WebSocket framework from string-based JSON to high-performance raw binary data streams (Opcode `0x82`). 
+
+### Core Architectural Changes:
+1. **High-Performance Binary WebSocket Streaming**
+   - Transformed the `server.c` WebSocket engine to natively use binary data formatting.
+   - Completely eradicated `CryptBinaryToStringA` dependencies, neutralizing the base64 encoding/decoding overhead in C.
+   - Drastically reduced server-side payload size and transmission latency for remote-desktop frames.
+
+2. **60 FPS Video Streaming & Surveillance**
+   - Bumped up the core execution loop in `server.c` from 5Hz (`Sleep(200)`) to an astonishing 60Hz (`Sleep(16)`).
+   - Re-engineered the client-side JavaScript (`web-app/script.js`) to parse `ArrayBuffer` objects instead of Base64 strings.
+   - Real-time client-side rendering implemented directly onto the HTML5 `<canvas>` using the `Blob` API, producing a buttery-smooth video feed.
+
+3. **Walkie-Talkie Two-Way Full-Duplex Audio Communication**
+   - Integrated Web Audio API into `web-app/script.js` to capture live microphone input via `getUserMedia`.
+   - The browser now encodes its PCM audio buffer and transmits raw byte-chunks seamlessly to the C server over the same WebSocket connection.
+   - Programmed Win32 `waveOut` audio playback architecture directly in `src/audio.c` to natively decode and output the browser's audio stream directly through the physical Windows speakers!
+
+4. **Resource & Version Refactoring**
+   - Stripped out string-escapes and regex-parsing overheads that were throttling the JSON parser.
+   - Updated executable PE Metadata tightly to `4.6.0.0` within `src/calc_avg.rc`.
+   - Completely overhauled `docs/releases/version_history.md` and `README.md` to proudly display Version 4.6 capabilities.
+   - Restructured the CSS/JS UI toggles to visually animate the glowing Walkie-Talkie state (`web-app/style.css`).

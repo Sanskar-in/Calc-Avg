@@ -24,5 +24,8 @@
 void play_data_sonification(double data_points[], int count);
 void start_microphone_stream_thread();
 char* get_latest_mic_base64();
+void init_audio_player();
+void play_audio_chunk(const unsigned char* data, int len);
+void cleanup_audio_player();
 
 #endif // AUDIO_H
