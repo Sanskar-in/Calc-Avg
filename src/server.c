@@ -958,7 +958,7 @@ unsigned __stdcall worker_thread_func(void* arg) {
                 }
                 
                 if (count > 1) {
-                    start_neural_network_training(data_array, count);
+                    start_neural_network_training(data_array, count, 10000, 10);
                     char json_resp[1024];
                     snprintf(json_resp, sizeof(json_resp), "{\"status\": \"Training Multi-Layer Perceptron over 10000 epochs...\", \"count\": %d}", count);
                     

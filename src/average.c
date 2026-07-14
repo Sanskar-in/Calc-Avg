@@ -303,54 +303,51 @@ double calc_avg_from_json(const char *filename) {
     double sum = 0.0;
     int count = 0;
     int ch;
+    bool in_array = false;
     bool in_string = false;
-    bool expect_value = false;
     char num_buffer[64];
     int num_idx = 0;
 
-    // Custom state machine to extract raw numbers specifically after a colon (key-value pairs)
     while ((ch = fgetc(file)) != EOF) {
         if (ch == '"') {
             in_string = !in_string;
             continue;
         }
-        
-        if (!in_string) {
-            if (ch == ':') {
-                expect_value = true;
+        if (in_string) continue;
+
+        if (!in_array) {
+            if (ch == '[') {
+                in_array = true;
                 num_idx = 0;
-            } else if (expect_value) {
-                if (isdigit(ch) || ch == '-' || ch == '.' || ch == 'e' || ch == 'E' || ch == '+') {
-                    if (num_idx < 63) {
-                        num_buffer[num_idx++] = (char)ch;
+            }
+        } else {
+            if (ch == ']') {
+                if (num_idx > 0) {
+                    num_buffer[num_idx] = '\0';
+                    char *endptr;
+                    double val = strtod(num_buffer, &endptr);
+                    if (endptr != num_buffer) {
+                        sum += val;
+                        count++;
                     }
-                } else if (isspace(ch)) {
-                    // ignore space after colon
-                } else {
-                    // end of number
-                    if (num_idx > 0) {
-                        num_buffer[num_idx] = '\0';
-                        char *endptr;
-                        double val = strtod(num_buffer, &endptr);
-                        if (endptr != num_buffer) {
-                            sum += val;
-                            count++;
-                        }
+                }
+                break; // end of array
+            } else if (ch == ',') {
+                if (num_idx > 0) {
+                    num_buffer[num_idx] = '\0';
+                    char *endptr;
+                    double val = strtod(num_buffer, &endptr);
+                    if (endptr != num_buffer) {
+                        sum += val;
+                        count++;
                     }
-                    expect_value = false;
                     num_idx = 0;
                 }
+            } else if (isdigit(ch) || ch == '-' || ch == '.' || ch == 'e' || ch == 'E' || ch == '+') {
+                if (num_idx < 63) {
+                    num_buffer[num_idx++] = (char)ch;
+                }
             }
-        }
-    }
-
-    if (num_idx > 0) {
-        num_buffer[num_idx] = '\0';
-        char *endptr;
-        double val = strtod(num_buffer, &endptr);
-        if (endptr != num_buffer) {
-            sum += val;
-            count++;
         }
     }
 

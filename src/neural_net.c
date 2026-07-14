@@ -19,6 +19,8 @@ char global_nn_final_result[4096] = "";
 typedef struct {
     float* data;
     int count;
+    int epochs;
+    int hidden_nodes;
 } NNTrainingData;
 
 double sigmoid(double x) { return 1.0 / (1.0 + exp(-x)); }
@@ -44,10 +46,15 @@ void train_neural_network_thread(void* arg) {
     float range = max_val - min_val;
     if (range == 0) range = 1.0;
 
-    // Architecture: 1 Input -> 10 Hidden -> 1 Output
-    int hidden_nodes = 10;
-    double w1[10], b1[10];
-    double w2[10], b2;
+    int hidden_nodes = td->hidden_nodes;
+    if (hidden_nodes <= 0 || hidden_nodes > 1000) hidden_nodes = 10;
+    
+    double *w1 = (double*)malloc(hidden_nodes * sizeof(double));
+    double *b1 = (double*)malloc(hidden_nodes * sizeof(double));
+    double *w2 = (double*)malloc(hidden_nodes * sizeof(double));
+    double *hidden = (double*)malloc(hidden_nodes * sizeof(double));
+    double *d_hidden = (double*)malloc(hidden_nodes * sizeof(double));
+    double b2 = ((double)rand() / RAND_MAX) * 2.0 - 1.0;
     
     // Initialize weights randomly [-1.0, 1.0]
     for (int i = 0; i < hidden_nodes; i++) {
@@ -55,10 +62,10 @@ void train_neural_network_thread(void* arg) {
         b1[i] = ((double)rand() / RAND_MAX) * 2.0 - 1.0;
         w2[i] = ((double)rand() / RAND_MAX) * 2.0 - 1.0;
     }
-    b2 = ((double)rand() / RAND_MAX) * 2.0 - 1.0;
 
     double learning_rate = 0.1;
-    int total_epochs = 10000;
+    int total_epochs = td->epochs;
+    if (total_epochs <= 0) total_epochs = 10000;
 
     for (int epoch = 1; epoch <= total_epochs; epoch++) {
         double total_loss = 0.0;
@@ -68,7 +75,7 @@ void train_neural_network_thread(void* arg) {
             double x = (td->data[i] - min_val) / range;
             double target = (td->data[i+1] - min_val) / range;
             
-            double hidden[10];
+
             for (int h = 0; h < hidden_nodes; h++) {
                 hidden[h] = sigmoid(x * w1[h] + b1[h]);
             }
@@ -84,7 +91,7 @@ void train_neural_network_thread(void* arg) {
 
             // Backpropagation
             double d_output = error * d_sigmoid(output);
-            double d_hidden[10];
+
             
             for (int h = 0; h < hidden_nodes; h++) {
                 d_hidden[h] = d_output * w2[h] * d_sigmoid(hidden[h]);
@@ -112,7 +119,7 @@ void train_neural_network_thread(void* arg) {
     
     // Predict next value (using the very last item in the sequence)
     double x = (td->data[td->count - 1] - min_val) / range;
-    double hidden[10];
+
     for (int h = 0; h < hidden_nodes; h++) {
         hidden[h] = sigmoid(x * w1[h] + b1[h]);
     }
@@ -126,15 +133,18 @@ void train_neural_network_thread(void* arg) {
     snprintf(global_nn_final_result, sizeof(global_nn_final_result), "{\"prediction\": %.4f, \"final_loss\": %.6f, \"epochs\": %d}", predicted, global_nn_loss, total_epochs);
 
     is_training_nn = 0;
+    free(w1); free(b1); free(w2); free(hidden); free(d_hidden);
     free(td->data);
     free(td);
 }
 
-void start_neural_network_training(float* data, int count) {
+void start_neural_network_training(float* data, int count, int epochs, int hidden_nodes) {
     NNTrainingData* td = (NNTrainingData*)malloc(sizeof(NNTrainingData));
     td->data = (float*)malloc(count * sizeof(float));
     for (int i = 0; i < count; i++) td->data[i] = data[i];
     td->count = count;
+    td->epochs = epochs;
+    td->hidden_nodes = hidden_nodes;
     
     global_nn_epoch = 0;
     global_nn_loss = 0.0;

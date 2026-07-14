@@ -7,6 +7,6 @@ extern int is_training_nn;
 extern char global_nn_final_result[4096];
 
 // The function called by API to spawn the background thread
-void start_neural_network_training(float* data, int count);
+void start_neural_network_training(float* data, int count, int epochs, int hidden_nodes);
 
 #endif
