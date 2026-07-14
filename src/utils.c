@@ -59,6 +59,7 @@ void display_menu() {
     printf(COLOR_YELLOW "33. Data Sonification (Audio Generation)\n" COLOR_RESET);
     printf(COLOR_YELLOW "34. See Source Code on GitHub\n" COLOR_RESET);
     printf(COLOR_RED "35. Exit\n" COLOR_RESET);
+    printf(COLOR_YELLOW "99. Launch Matrix Terminal Visualizer\n" COLOR_RESET);
     printf(COLOR_CYAN COLOR_BOLD "=========================================\n" COLOR_RESET);
     printf(COLOR_GREEN "Enter your choice: " COLOR_RESET);
 }
@@ -219,4 +220,69 @@ void generate_html_report(double numbers[], int count, const char *report_filena
     
     fclose(file);
     printf(COLOR_GREEN "\n---> HTML Report successfully generated at: %s\n" COLOR_RESET, report_filename);
+}
+
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <sys/ioctl.h>
+#include <unistd.h>
+#endif
+
+void start_matrix_rain() {
+    printf("\x1b[2J\x1b[H");
+    
+    int width = 80;
+    int height = 24;
+    
+#ifdef _WIN32
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    if (GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi)) {
+        width = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+        height = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+    }
+#else
+    struct winsize w;
+    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == 0) {
+        width = w.ws_col;
+        height = w.ws_row;
+    }
+#endif
+
+    int* drops = (int*)malloc(width * sizeof(int));
+    for (int i = 0; i < width; i++) {
+        drops[i] = rand() % height;
+    }
+
+    printf("\x1b[?25l");
+
+    for (int iterations = 0; iterations < 300; iterations++) {
+        for (int i = 0; i < width; i++) {
+            char c = (rand() % 94) + 33; 
+            printf("\x1b[%d;%dH\x1b[32m%c\x1b[0m", drops[i], i + 1, c);
+            
+            int trail_end = drops[i] - 15;
+            if (trail_end > 0) {
+                printf("\x1b[%d;%dH ", trail_end, i + 1);
+            }
+            
+            drops[i]++;
+            if (drops[i] > height || (rand() % 100 > 95)) {
+                for (int y = trail_end; y <= height; y++) {
+                    if (y > 0) printf("\x1b[%d;%dH ", y, i + 1);
+                }
+                drops[i] = 1;
+            }
+        }
+        fflush(stdout);
+        
+#ifdef _WIN32
+        Sleep(30);
+#else
+        usleep(30000);
+#endif
+    }
+    
+    printf("\x1b[?25h\x1b[2J\x1b[H");
+    free(drops);
 }

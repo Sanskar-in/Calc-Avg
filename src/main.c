@@ -883,8 +883,11 @@ int main(int argc, char *argv[])
         case 35:
             printf(COLOR_CYAN COLOR_BOLD "\nExiting Calc-Avg. Thank you for using this open-source project by Sanskar!\n" COLOR_RESET);
             return 0;
+        case 99:
+            start_matrix_rain();
+            break;
         default:
-            printf(COLOR_RED "Invalid choice. Please select an option between 1 and 35.\n" COLOR_RESET);
+            printf(COLOR_RED "Invalid choice. Please select a valid option.\n" COLOR_RESET);
             break;
         }
     }

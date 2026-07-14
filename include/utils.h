@@ -85,4 +85,9 @@ void print_ascii_bar_chart(double numbers[], int count);
  */
 void generate_html_report(double numbers[], int count, const char *report_filename);
 
+/**
+ * Runs a multithreaded Matrix Digital Rain visualizer in the terminal.
+ */
+void start_matrix_rain();
+
 #endif // UTILS_H
