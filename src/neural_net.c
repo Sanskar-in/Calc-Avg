@@ -1,6 +1,10 @@
 #include "../include/neural_net.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#ifndef _WIN32
+#include <pthread.h>
+#endif
 #include <math.h>
 #include <string.h>
 
@@ -27,7 +31,11 @@ double sigmoid(double x) { return 1.0 / (1.0 + exp(-x)); }
 double d_sigmoid(double x) { return x * (1.0 - x); }
 
 // Background Thread Function
+#ifdef _WIN32
 void train_neural_network_thread(void* arg) {
+#else
+void* train_neural_network_thread(void* arg) {
+#endif
     NNTrainingData* td = (NNTrainingData*)arg;
     int n_samples = td->count - 1;
     if (n_samples <= 0) {
@@ -136,6 +144,9 @@ void train_neural_network_thread(void* arg) {
     free(w1); free(b1); free(w2); free(hidden); free(d_hidden);
     free(td->data);
     free(td);
+#ifndef _WIN32
+    return NULL;
+#endif
 }
 
 void start_neural_network_training(float* data, int count, int epochs, int hidden_nodes) {
@@ -153,5 +164,9 @@ void start_neural_network_training(float* data, int count, int epochs, int hidde
     
     #ifdef _WIN32
     _beginthread(train_neural_network_thread, 0, (void*)td);
+    #else
+    pthread_t ai_thread;
+    pthread_create(&ai_thread, NULL, train_neural_network_thread, (void*)td);
+    pthread_detach(ai_thread);
     #endif
 }

@@ -191,6 +191,7 @@ This document chronicles the legendary evolution of the **Calc-Avg** project, hi
 *Calc-Avg is a 100% open-source C framework developed by Sanskar.*
 
 ## Versions
+- **v5.2.0.0** - The AI POSIX Patch (Deep Learning Engine UNIX Threading Fix)
 - **v5.1.0.0** - The Security & POSIX Hardening Update (Thread Pool Unix Compatibility)
 - **v5.0.0.0** - The Final Polish (Masterpiece Edition - Complete Web Dashboard UI/UX)
 - **v4.9.0.0** - The POSIX Cross-Platform Expansion (Linux/macOS Support via Pthreads/Sockets)
