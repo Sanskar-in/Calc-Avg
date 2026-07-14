@@ -1028,19 +1028,35 @@ void* worker_thread_func(void* arg) {
             }
             // API Endpoint: /api/train_nn (Deep Learning)
             else if (strncmp(path, "/api/train_nn?data=", 19) == 0) {
-                char* query = path + 19;
+                char data_param[2048] = {0};
+                char epochs_param[32] = {0};
+                char nodes_param[32] = {0};
+                
+                parse_query_param(path, "data", data_param, sizeof(data_param));
+                parse_query_param(path, "epochs", epochs_param, sizeof(epochs_param));
+                parse_query_param(path, "nodes", nodes_param, sizeof(nodes_param));
+                
+                int epochs = atoi(epochs_param);
+                if (epochs <= 0) epochs = 10000;
+                
+                int nodes = atoi(nodes_param);
+                if (nodes <= 0) nodes = 10;
+
+                char decoded[2048] = {0};
+                decode_url(decoded, data_param);
+
                 int count = 0;
                 float data_array[1000];
-                char* token = strtok(query, ",");
+                char* token = strtok(decoded, ",");
                 while(token != NULL && count < 1000) {
                     data_array[count++] = atof(token);
                     token = strtok(NULL, ",");
                 }
                 
                 if (count > 1) {
-                    start_neural_network_training(data_array, count, 10000, 10);
+                    start_neural_network_training(data_array, count, epochs, nodes);
                     char json_resp[1024];
-                    snprintf(json_resp, sizeof(json_resp), "{\"status\": \"Training Multi-Layer Perceptron over 10000 epochs...\", \"count\": %d}", count);
+                    snprintf(json_resp, sizeof(json_resp), "{\"status\": \"Training Multi-Layer Perceptron over %d epochs with %d nodes...\", \"count\": %d}", epochs, nodes, count);
                     
                     printf("API Request: Started Neural Network Training on %d items.\n", count);
                     log_to_db("Deep Learning AI", "Sequence Training Data", json_resp);

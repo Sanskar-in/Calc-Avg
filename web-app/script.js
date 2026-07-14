@@ -170,7 +170,38 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // =======================================================
-    // TAB 3: Financial SMA (Simple Moving Average)
+// =======================================================
+    // TAB X: Deep Learning AI (Neural Net)
+    // =======================================================
+    document.getElementById('nn-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const dataStr = document.getElementById('nn-data').value.trim();
+        const epochs = document.getElementById('nn-epochs').value;
+        const nodes = document.getElementById('nn-nodes').value;
+        const container = document.getElementById('nn-results');
+        const status = document.getElementById('nn-status');
+
+        if (!dataStr) return;
+
+        try {
+            const encodedData = encodeURIComponent(dataStr);
+            const response = await fetch(`/api/train_nn?data=${encodedData}&epochs=${epochs}&nodes=${nodes}`);
+            
+            if (!response.ok) throw new Error("C Backend Error");
+            const data = await response.json();
+            
+            if (data.error) throw new Error(data.error);
+
+            container.classList.remove('hidden');
+            status.innerText = data.status;
+            status.style.color = "#38bdf8";
+            
+        } catch (err) {
+            console.error(err);
+            alert("Error communicating with C Backend.");
+        }
+    });
+\n    // TAB 3: Financial SMA (Simple Moving Average)
     // =======================================================
     document.getElementById('sma-form').addEventListener('submit', async (e) => {
         e.preventDefault();

@@ -3,8 +3,8 @@
 MAINICON ICON "icon.ico"
 
 1 VERSIONINFO
-FILEVERSION     4,9,0,0
-PRODUCTVERSION  4,9,0,0
+FILEVERSION     5,0,0,0
+PRODUCTVERSION  5,0,0,0
 FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
 FILEFLAGS       0x0L
 FILEOS          VOS_NT_WINDOWS32
@@ -17,12 +17,12 @@ BEGIN
     BEGIN
       VALUE "CompanyName", "Sanskar"
       VALUE "FileDescription", "Calc-Avg - Advanced C Mathematical & Surveillance Engine (V4.7 The Security & Auth Expansion)"
-      VALUE "FileVersion", "4.9.0.0"
-      VALUE "InternalName", "CalcAvg"
-      VALUE "LegalCopyright", "Copyright (C) 2026 Sanskar"
+      VALUE "FileVersion", "5.0.0.0"
+      VALUE "InternalName", "calc_avg"
+      VALUE "LegalCopyright", "Copyright (c) 2026 Sanskar"
       VALUE "OriginalFilename", "calc_avg.exe"
-      VALUE "ProductName", "Calc-Avg Suite"
-      VALUE "ProductVersion", "4.9.0.0"
+      VALUE "ProductName", "Calc-Avg V5 (The Masterpiece Edition)"
+      VALUE "ProductVersion", "5.0.0.0"
     END
   END
   BLOCK "VarFileInfo"

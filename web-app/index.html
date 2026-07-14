@@ -154,6 +154,71 @@
                 </div>
             </section>
 
+            <!-- Tab 4: Deep Learning AI -->
+            <section id="tab-nn" class="tab-content">
+                <form id="nn-form" class="data-form">
+                    <label>Enter Sequential Data (comma-separated):</label>
+                    <input type="text" id="nn-data" placeholder="e.g. 1, 2, 4, 8, 16" required autocomplete="off">
+                    <label>Epochs (Training Cycles):</label>
+                    <input type="number" id="nn-epochs" value="10000" min="100" max="50000" required>
+                    <label>Hidden Nodes:</label>
+                    <input type="number" id="nn-nodes" value="10" min="2" max="100" required>
+                    <button type="submit" class="glow-btn nn-btn">Spawn AI Thread</button>
+                </form>
+                <div id="nn-results" class="results-container hidden" style="text-align: center; margin-top: 20px;">
+                    <h3 id="nn-status" style="color: #38bdf8; margin-bottom: 15px;">Initializing Neural Network...</h3>
+                    <p style="color: #94a3b8; font-size: 0.9em;">(Switch to the "🔴 Live Stream" tab to watch the AI's loss curve broadcast in real-time via WebSockets!)</p>
+                </div>
+            </section>
+
+            <!-- Tab 5: Calculus -->
+            <section id="tab-calculus" class="tab-content">
+                <form id="calculus-form" class="data-form">
+                    <label>Enter Function Data Points (comma-separated):</label>
+                    <input type="text" id="calculus-data" placeholder="e.g. 0, 2.5, 5, 7.5, 10" required autocomplete="off">
+                    <label>Step Interval (dx):</label>
+                    <input type="number" id="calculus-step" value="1" step="0.01" min="0.01" required>
+                    <button type="submit" class="glow-btn calc-btn">Compute Integral & Derivative</button>
+                </form>
+                <div id="calculus-results" class="results-container hidden">
+                    <div class="equation-box">Total Area (Integral): <span id="calc-integral" style="color: #38bdf8;"></span></div>
+                    <div class="chart-wrapper">
+                        <canvas id="calculusChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 6: Crypto -->
+            <section id="tab-crypto" class="tab-content">
+                <form id="crypto-form" class="data-form">
+                    <label>Enter Message to Hash (comma-separated bytes or numbers):</label>
+                    <input type="text" id="crypto-data" placeholder="e.g. 104, 101, 108, 108, 111" required autocomplete="off">
+                    <button type="submit" class="glow-btn crypto-btn">Generate SHA-256 Signature</button>
+                </form>
+                <div id="crypto-results" class="results-container hidden">
+                    <div class="equation-box" id="crypto-hash" style="word-break: break-all; font-family: monospace; color: #10b981;"></div>
+                </div>
+            </section>
+
+            <!-- Tab 7: Compress -->
+            <section id="tab-compress" class="tab-content">
+                <form id="compress-form" class="data-form">
+                    <label>Enter Repetitive Data Array (comma-separated):</label>
+                    <input type="text" id="compress-data" placeholder="e.g. 5, 5, 5, 5, 9, 9, 2, 2, 2" required autocomplete="off">
+                    <button type="submit" class="glow-btn compress-btn">Run RLE Compression</button>
+                </form>
+                <div id="compress-results" class="results-container hidden">
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="stat-title">Original Size</div><div class="stat-value" id="comp-orig"></div></div>
+                        <div class="stat-card"><div class="stat-title">Compressed Size</div><div class="stat-value" id="comp-new"></div></div>
+                        <div class="stat-card"><div class="stat-title">Compression Ratio</div><div class="stat-value" id="comp-ratio"></div></div>
+                    </div>
+                    <div class="equation-box" style="margin-top: 15px; word-break: break-all;">
+                        <strong>Hex Stream:</strong><br><span id="comp-stream" style="font-family: monospace; color: #a78bfa;"></span>
+                    </div>
+                </div>
+            </section>
+
             <!-- Tab 9: Big Data CSV -->
             <section id="tab-csv" class="tab-content">
                 <div class="data-form" style="text-align: center;">
