@@ -20,7 +20,14 @@ This document chronicles the legendary evolution of the **Calc-Avg** project, hi
 
 ---
 
-## 🌟 Version 4.6: The Binary Streaming Expansion (LATEST)
+## 🌟 Version 4.7: The Security & Auth Expansion (LATEST)
+**Status:** Released
+- **Authentication Gateway**: Engineered a secure login portal located at `web-app/login.html` leveraging the premium Glassmorphism aesthetic. Introduced a native `/api/login` route in the C server that validates credentials.
+- **Cryptographic Session Management (SHA-256)**: Deployed the native C implementation of SHA-256 (`crypto.c`) to generate irreversible cryptographic tokens upon successful authentication. Session tokens are stored in the server's heap memory and tracked asynchronously utilizing Windows `CRITICAL_SECTION` synchronization.
+- **HTTP Cookie Routing & Security**: The C server now inherently parses incoming `Cookie:` headers. Any unauthenticated HTTP request targeting private APIs or the dashboard is immediately redirected via `HTTP 302 Found` to the login gateway.
+- **WebSocket Connection Filtering**: Implemented strict handshake interception during the `Upgrade: websocket` protocol negotiation. WebSockets attempting to establish the high-speed 60FPS surveillance stream without a valid session token are aggressively dropped with a `401 Unauthorized` response.
+
+## 🌟 Version 4.6: The Binary Streaming Expansion
 **Status:** Released
 - **High-Performance Binary WebSocket Streaming**: Transformed the WebSocket engine to use binary data formatting (Opcode `0x82`). Removed `CryptBinaryToStringA` dependencies, neutralizing the base64 encoding/decoding overhead.
 - **60 FPS Video Streaming & Surveillance**: Bumped up the core loop from 5Hz (`Sleep(200)`) to 60Hz (`Sleep(16)`). Real-time client-side rendering implemented directly onto HTML5 `<canvas>` via `ArrayBuffer` handling.

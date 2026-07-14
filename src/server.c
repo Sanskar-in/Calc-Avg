@@ -452,6 +452,65 @@ void api_compress_data(const double* numbers, int count, char* compressed_hex, i
 
 
 
+
+// --- Security & Auth (V4.7) ---
+#define MAX_SESSIONS 100
+char active_sessions[MAX_SESSIONS][65];
+int session_count = 0;
+CRITICAL_SECTION session_lock;
+
+void add_session(const char* token) {
+    EnterCriticalSection(&session_lock);
+    if (session_count < MAX_SESSIONS) {
+        strcpy(active_sessions[session_count], token);
+        session_count++;
+    } else {
+        // Shift sessions if full
+        for (int i = 1; i < MAX_SESSIONS; i++) {
+            strcpy(active_sessions[i-1], active_sessions[i]);
+        }
+        strcpy(active_sessions[MAX_SESSIONS-1], token);
+    }
+    LeaveCriticalSection(&session_lock);
+}
+
+int is_valid_session(const char* token) {
+    if (!token || strlen(token) == 0) return 0;
+    EnterCriticalSection(&session_lock);
+    for (int i = 0; i < session_count; i++) {
+        if (strcmp(active_sessions[i], token) == 0) {
+            LeaveCriticalSection(&session_lock);
+            return 1;
+        }
+    }
+    LeaveCriticalSection(&session_lock);
+    return 0;
+}
+
+void extract_cookie(const char* request, const char* cookie_name, char* output, int out_len) {
+    output[0] = '\0';
+    char search_str[64];
+    snprintf(search_str, sizeof(search_str), "%s=", cookie_name);
+    
+    const char* cookie_header = strstr(request, "Cookie: ");
+    if (!cookie_header) return;
+    
+    const char* start = strstr(cookie_header, search_str);
+    if (!start) return;
+    
+    start += strlen(search_str);
+    const char* end = start;
+    while (*end != ';' && *end != '\r' && *end != '\n' && *end != '\0') {
+        end++;
+    }
+    
+    int len = end - start;
+    if (len >= out_len) len = out_len - 1;
+    strncpy(output, start, len);
+    output[len] = '\0';
+}
+// ------------------------------
+
 // --- Thread Pool Variables ---
 #define THREAD_POOL_SIZE 8
 #define QUEUE_SIZE 256
@@ -487,6 +546,92 @@ unsigned __stdcall worker_thread_func(void* arg) {
             
             char method[16], path[1024];
             sscanf(buffer, "%15s %1023s", method, path);
+            char session_token[128] = {0};
+            extract_cookie(buffer, "session_token", session_token, sizeof(session_token));
+            int is_auth = is_valid_session(session_token);
+            
+            // Allow public routes
+            int is_public = 0;
+            if (strcmp(path, "/login.html") == 0 || 
+                strcmp(path, "/api/login") == 0 || 
+                strcmp(path, "/style.css") == 0 || 
+                strcmp(path, "/logo.png") == 0) {
+                is_public = 1;
+            }
+            
+            if (!is_auth && !is_public) {
+                // If it's a websocket upgrade, reject with 401
+                if (strstr(buffer, "Upgrade: websocket") != NULL) {
+                    char response[] = "HTTP/1.1 401 Unauthorized\r\nConnection: close\r\n\r\n";
+                    send(ClientSocket, response, strlen(response), 0);
+                    closesocket(ClientSocket);
+                    continue;
+                }
+                
+                // Otherwise redirect to /login.html
+                char response[] = "HTTP/1.1 302 Found\r\nLocation: /login.html\r\nConnection: close\r\n\r\n";
+                send(ClientSocket, response, strlen(response), 0);
+                closesocket(ClientSocket);
+                continue;
+            }
+            
+            // Handle /api/login specifically
+            if (strcmp(path, "/api/login") == 0 && strcmp(method, "POST") == 0) {
+                char* body = strstr(buffer, "\r\n\r\n");
+                if (body) {
+                    body += 4;
+                    // Simple parse username & password from form-urlencoded or JSON
+                    char user[64] = {0};
+                    char pass[64] = {0};
+                    
+                    if (strstr(body, "username=") != NULL) {
+                        parse_query_param(body, "username", user, sizeof(user));
+                        parse_query_param(body, "password", pass, sizeof(pass));
+                    } else if (strstr(body, "\"username\"") != NULL) {
+                        // Naive JSON parse
+                        char* u_ptr = strstr(body, "\"username\"");
+                        if (u_ptr) sscanf(u_ptr, "\"username\":\"%63[^\"]\"", user);
+                        char* p_ptr = strstr(body, "\"password\"");
+                        if (p_ptr) sscanf(p_ptr, "\"password\":\"%63[^\"]\"", pass);
+                    }
+                    
+                    if (strcmp(user, "admin") == 0 && strcmp(pass, "calc_avg_secure_2026") == 0) {
+                        // Generate session token (Hash of timestamp + random)
+                        char raw_data[128];
+                        snprintf(raw_data, sizeof(raw_data), "admin_%d_%d", (int)GetTickCount(), rand());
+                        
+                        SHA256_CTX ctx;
+                        sha256_init(&ctx);
+                        sha256_update(&ctx, (const uint8_t*)raw_data, strlen(raw_data));
+                        uint8_t hash_bytes[32];
+                        sha256_final(&ctx, hash_bytes);
+                        
+                        char hash_hex[65];
+                        for (int i = 0; i < 32; i++) sprintf(hash_hex + (i * 2), "%02x", hash_bytes[i]);
+                        hash_hex[64] = '\0';
+                        
+                        add_session(hash_hex);
+                        
+                        char response[512];
+                        snprintf(response, sizeof(response), 
+                            "HTTP/1.1 200 OK\r\n"
+                            "Set-Cookie: session_token=%s; Path=/; HttpOnly\r\n"
+                            "Content-Type: application/json\r\n"
+                            "Connection: close\r\n\r\n"
+                            "{\"status\":\"success\", \"message\":\"Logged in\"}", hash_hex);
+                        send(ClientSocket, response, strlen(response), 0);
+                    } else {
+                        char err[] = "HTTP/1.1 401 Unauthorized\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n{\"error\":\"Invalid credentials\"}";
+                        send(ClientSocket, err, strlen(err), 0);
+                    }
+                } else {
+                    char err[] = "HTTP/1.1 400 Bad Request\r\nConnection: close\r\n\r\n";
+                    send(ClientSocket, err, strlen(err), 0);
+                }
+                closesocket(ClientSocket);
+                continue;
+            }
+
             
             // Handle WebSockets
             if (strstr(buffer, "Upgrade: websocket") != NULL) {
@@ -945,6 +1090,11 @@ unsigned __stdcall worker_thread_func(void* arg) {
                 if (strcmp(path, "/") == 0) {
                     send_file(ClientSocket, "web-app/index.html", "text/html");
                     printf("Served: web-app/index.html\n");
+                } else if (strcmp(path, "/login.html") == 0) {
+                    send_file(ClientSocket, "web-app/login.html", "text/html");
+                    printf("Served: web-app/login.html\n");
+                    send_file(ClientSocket, "web-app/index.html", "text/html");
+                    printf("Served: web-app/index.html\n");
                 } else if (strcmp(path, "/style.css") == 0) {
                     send_file(ClientSocket, "web-app/style.css", "text/css");
                     printf("Served: web-app/style.css\n");
@@ -997,6 +1147,7 @@ void launch_web_server(void) {
     init_global_hooks();
     start_microphone_stream_thread();
     
+    InitializeCriticalSection(&session_lock);
     InitializeCriticalSection(&queue_lock);
     InitializeConditionVariable(&queue_cond);
     

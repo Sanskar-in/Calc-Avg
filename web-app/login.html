@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Calc-Avg Secure Gateway</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div class="glass-panel" style="max-width: 450px; width: 100%; padding: 40px;">
+        <header class="app-header" style="flex-direction: column; text-align: center;">
+            <img src="logo.png" alt="Calc-Avg Logo" class="app-logo" style="width: 80px; height: 80px; margin-bottom: 20px;">
+            <div class="titles">
+                <h1>Calc-Avg <span class="version-badge">Secure Gateway</span></h1>
+                <p class="subtitle">Please authenticate to access the system.</p>
+            </div>
+        </header>
+
+        <main style="margin-top: 30px;">
+            <form id="login-form" class="data-form">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter admin username" required autocomplete="off" style="margin-bottom: 20px;">
+                
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter secure password" required autocomplete="off" style="margin-bottom: 30px;">
+                
+                <div id="login-error" style="color: #f43f5e; font-size: 0.9em; margin-bottom: 15px; text-align: center; display: none;">Invalid credentials.</div>
+                
+                <button type="submit" class="glow-btn" style="width: 100%; font-size: 1.1em; padding: 15px;">Authenticate</button>
+            </form>
+        </main>
+        
+        <footer class="app-footer" style="margin-top: 40px; text-align: center;">
+            <p>&copy; Copyright Sanskar. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const errorDiv = document.getElementById('login-error');
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value.trim();
+            
+            btn.innerText = "Authenticating...";
+            btn.style.opacity = "0.7";
+            errorDiv.style.display = "none";
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`
+                });
+                
+                if (response.ok) {
+                    btn.innerText = "Access Granted";
+                    btn.style.background = "rgba(16, 185, 129, 0.2)";
+                    btn.style.borderColor = "#10b981";
+                    setTimeout(() => {
+                        window.location.href = "/";
+                    }, 500);
+                } else {
+                    const data = await response.json();
+                    errorDiv.innerText = data.error || "Authentication failed";
+                    errorDiv.style.display = "block";
+                    btn.innerText = "Authenticate";
+                    btn.style.opacity = "1";
+                }
+            } catch (err) {
+                console.error(err);
+                errorDiv.innerText = "Network error communicating with Server.";
+                errorDiv.style.display = "block";
+                btn.innerText = "Authenticate";
+                btn.style.opacity = "1";
+            }
+        });
+    </script>
+</body>
+</html>
