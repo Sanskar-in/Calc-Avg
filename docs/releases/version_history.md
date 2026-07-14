@@ -190,4 +190,8 @@ This document chronicles the legendary evolution of the **Calc-Avg** project, hi
 ---
 *Calc-Avg is a 100% open-source C framework developed by Sanskar.*
 
+## Versions
+- **v4.9.0.0** - The POSIX Cross-Platform Expansion (Linux/macOS Support via Pthreads/Sockets)
+- **v4.8.0.0** - The Core Engine Optimization (Dynamic Neural Net Heap Allocation & JSON Parser Overhaul)
+
 - [v4.8 - The Core Engine Optimization](v4.8.md)

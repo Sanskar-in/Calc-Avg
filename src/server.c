@@ -61,14 +61,33 @@ void log_to_db(const char* operation, const char* input_data, const char* result
 }
 
 #ifdef _WIN32
+#ifdef _WIN32
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <wincrypt.h>
+#include <process.h>
 #pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "crypt32.lib")
+#else
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <errno.h>
+#include <stdint.h>
+#include <fcntl.h>
+#define SOCKET int
+#define INVALID_SOCKET -1
+#define SOCKET_ERROR -1
+#define closesocket close
+#define WSAEWOULDBLOCK EWOULDBLOCK
+#define WSAGetLastError() errno
+#endif
 
 // For WebSocket Handshake
 void generate_ws_accept_key(const char* client_key, char* accept_key) {
+#ifdef _WIN32
     char combined[256];
     snprintf(combined, sizeof(combined), "%s258EAFA5-E914-47DA-95CA-C5AB0DC85B11", client_key);
     
@@ -90,9 +109,14 @@ void generate_ws_accept_key(const char* client_key, char* accept_key) {
         }
         CryptReleaseContext(hProv, 0);
     }
+#else
+    (void)client_key;
+    strcpy(accept_key, "stubbed");
+#endif
 }
 
 // --- Live Windows System Monitor (CPU & RAM) ---
+#ifdef _WIN32
 static FILETIME prev_idle, prev_kernel, prev_user;
 static int first_cpu_call = 1;
 
@@ -102,8 +126,10 @@ static ULONGLONG file_time_2_utc(const FILETIME* ftime) {
     li.HighPart = ftime->dwHighDateTime;
     return li.QuadPart;
 }
+#endif
 
 double get_cpu_usage() {
+#ifdef _WIN32
     FILETIME idle, kernel, user;
     if (!GetSystemTimes(&idle, &kernel, &user)) return 0.0;
     
@@ -131,9 +157,13 @@ double get_cpu_usage() {
     prev_user = user;
     
     return cpu_usage;
+#else
+    return 0.0;
+#endif
 }
 
 double get_ram_usage() {
+#ifdef _WIN32
     MEMORYSTATUSEX memInfo;
     memInfo.dwLength = sizeof(MEMORYSTATUSEX);
     if (!GlobalMemoryStatusEx(&memInfo)) return 0.0;
@@ -143,17 +173,23 @@ double get_ram_usage() {
     
     if (totalPhysMem == 0) return 0.0;
     return (double)physMemUsed / (double)totalPhysMem * 100.0;
+#else
+    return 0.0;
+#endif
 }
 
 // --- Live Remote Desktop Screen Capture ---
+#ifdef _WIN32
 #pragma pack(push, 1)
 typedef struct {
     BITMAPFILEHEADER bfh;
     BITMAPINFOHEADER bih;
 } BMPHEADER;
 #pragma pack(pop)
+#endif
 
 char* capture_screen_base64() {
+#ifdef _WIN32
     HDC hScreenDC = GetDC(NULL);
     HDC hMemoryDC = CreateCompatibleDC(hScreenDC);
     int width = GetDeviceCaps(hScreenDC, HORZRES);
@@ -212,20 +248,36 @@ char* capture_screen_base64() {
     ReleaseDC(NULL, hScreenDC);
     
     return b64Str;
+#else
+    return NULL;
+#endif
 }
 
 
+#ifdef _WIN32
 DWORD WINAPI websocket_stream_thread(LPVOID arg) {
-    SOCKET ws_socket = (SOCKET)arg;
+    SOCKET ws_socket = (SOCKET)(intptr_t)arg;
+#else
+void* websocket_stream_thread(void* arg) {
+    SOCKET ws_socket = (SOCKET)(intptr_t)arg;
+#endif
     init_audio_player();
     
     // Create a receiver thread to handle incoming binary audio frames from the Walkie-Talkie
     // (For simplicity in this monolithic C code without creating more thread state, we'll use non-blocking recv)
+#ifdef _WIN32
     u_long mode = 1;
     ioctlsocket(ws_socket, FIONBIO, &mode);
+#else
+    fcntl(ws_socket, F_SETFL, O_NONBLOCK);
+#endif
     
     while (1) {
-        Sleep(16); // 60Hz Update for smooth streaming
+#ifdef _WIN32
+        Sleep(16);
+#else
+        usleep(16000);
+#endif // 60Hz Update for smooth streaming
         
         // --- 1. Receive Walkie-Talkie Audio from Browser ---
         BYTE recv_buf[8192];
@@ -457,10 +509,18 @@ void api_compress_data(const double* numbers, int count, char* compressed_hex, i
 #define MAX_SESSIONS 100
 char active_sessions[MAX_SESSIONS][65];
 int session_count = 0;
+#ifdef _WIN32
 CRITICAL_SECTION session_lock;
+#else
+pthread_mutex_t session_lock;
+#endif
 
 void add_session(const char* token) {
+#ifdef _WIN32
     EnterCriticalSection(&session_lock);
+#else
+    pthread_mutex_lock(&session_lock);
+#endif
     if (session_count < MAX_SESSIONS) {
         strcpy(active_sessions[session_count], token);
         session_count++;
@@ -471,19 +531,35 @@ void add_session(const char* token) {
         }
         strcpy(active_sessions[MAX_SESSIONS-1], token);
     }
+#ifdef _WIN32
     LeaveCriticalSection(&session_lock);
+#else
+    pthread_mutex_unlock(&session_lock);
+#endif
 }
 
 int is_valid_session(const char* token) {
     if (!token || strlen(token) == 0) return 0;
+#ifdef _WIN32
     EnterCriticalSection(&session_lock);
+#else
+    pthread_mutex_lock(&session_lock);
+#endif
     for (int i = 0; i < session_count; i++) {
         if (strcmp(active_sessions[i], token) == 0) {
-            LeaveCriticalSection(&session_lock);
+        #ifdef _WIN32
+    LeaveCriticalSection(&session_lock);
+#else
+    pthread_mutex_unlock(&session_lock);
+#endif
             return 1;
         }
     }
+#ifdef _WIN32
     LeaveCriticalSection(&session_lock);
+#else
+    pthread_mutex_unlock(&session_lock);
+#endif
     return 0;
 }
 
@@ -522,7 +598,11 @@ int queue_count = 0;
 CRITICAL_SECTION queue_lock;
 CONDITION_VARIABLE queue_cond;
 
+#ifdef _WIN32
 unsigned __stdcall worker_thread_func(void* arg) {
+#else
+void* worker_thread_func(void* arg) {
+#endif
     char buffer[BUFFER_SIZE];
     while (1) {
         SOCKET ClientSocket = INVALID_SOCKET;
@@ -1122,7 +1202,14 @@ void launch_web_server(void) {
     if (iResult != 0) return;
 
     SOCKET ListenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (ListenSocket == INVALID_SOCKET) { WSACleanup(); return; }
+    if (ListenSocket == INVALID_SOCKET) {
+#ifdef _WIN32
+    #ifdef _WIN32
+    WSACleanup();
+#endif
+#endif
+        return;
+    }
 
     struct sockaddr_in serverAddr;
     serverAddr.sin_family = AF_INET;
@@ -1147,12 +1234,22 @@ void launch_web_server(void) {
     init_global_hooks();
     start_microphone_stream_thread();
     
+#ifdef _WIN32
     InitializeCriticalSection(&session_lock);
+#else
+    pthread_mutex_init(&session_lock, NULL);
+#endif
     InitializeCriticalSection(&queue_lock);
     InitializeConditionVariable(&queue_cond);
     
     for (int i = 0; i < THREAD_POOL_SIZE; i++) {
+        #ifdef _WIN32
         _beginthreadex(NULL, 0, worker_thread_func, NULL, 0, NULL);
+#else
+        pthread_t thread_id;
+        pthread_create(&thread_id, NULL, worker_thread_func, NULL);
+        pthread_detach(thread_id);
+#endif
     }
 
     while (1) {
@@ -1173,7 +1270,9 @@ void launch_web_server(void) {
     }
 
     closesocket(ListenSocket);
+#ifdef _WIN32
     WSACleanup();
+#endif
 }
 
 #else
