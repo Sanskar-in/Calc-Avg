@@ -595,8 +595,13 @@ SOCKET client_queue[QUEUE_SIZE];
 int queue_head = 0;
 int queue_tail = 0;
 int queue_count = 0;
+#ifdef _WIN32
 CRITICAL_SECTION queue_lock;
 CONDITION_VARIABLE queue_cond;
+#else
+pthread_mutex_t queue_lock;
+pthread_cond_t queue_cond;
+#endif
 
 #ifdef _WIN32
 unsigned __stdcall worker_thread_func(void* arg) {
@@ -607,15 +612,25 @@ void* worker_thread_func(void* arg) {
     while (1) {
         SOCKET ClientSocket = INVALID_SOCKET;
         
+#ifdef _WIN32
         EnterCriticalSection(&queue_lock);
         while (queue_count == 0) {
             SleepConditionVariableCS(&queue_cond, &queue_lock, INFINITE);
         }
-        
         ClientSocket = client_queue[queue_head];
         queue_head = (queue_head + 1) % QUEUE_SIZE;
         queue_count--;
         LeaveCriticalSection(&queue_lock);
+#else
+        pthread_mutex_lock(&queue_lock);
+        while (queue_count == 0) {
+            pthread_cond_wait(&queue_cond, &queue_lock);
+        }
+        ClientSocket = client_queue[queue_head];
+        queue_head = (queue_head + 1) % QUEUE_SIZE;
+        queue_count--;
+        pthread_mutex_unlock(&queue_lock);
+#endif
         
         if (ClientSocket == INVALID_SOCKET) continue;
 
@@ -739,7 +754,13 @@ void* worker_thread_func(void* arg) {
                     send(ClientSocket, response, strlen(response), 0);
                     
                     // Spawn stream thread
+#ifdef _WIN32
                     CreateThread(NULL, 0, websocket_stream_thread, (LPVOID)ClientSocket, 0, NULL);
+#else
+                    pthread_t ws_thread;
+                    pthread_create(&ws_thread, NULL, websocket_stream_thread, (void*)(intptr_t)ClientSocket);
+                    pthread_detach(ws_thread);
+#endif
                     printf("API Request: Upgraded to WebSocket. Spawning massive 5Hz Remote Desktop stream thread!\n");
                     continue; // Skip closesocket
                 }
@@ -1255,8 +1276,13 @@ void launch_web_server(void) {
 #else
     pthread_mutex_init(&session_lock, NULL);
 #endif
+#ifdef _WIN32
     InitializeCriticalSection(&queue_lock);
     InitializeConditionVariable(&queue_cond);
+#else
+    pthread_mutex_init(&queue_lock, NULL);
+    pthread_cond_init(&queue_cond, NULL);
+#endif
     
     for (int i = 0; i < THREAD_POOL_SIZE; i++) {
         #ifdef _WIN32
