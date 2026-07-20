@@ -32,20 +32,28 @@ HWND hInputBox, hCalcButton, hResultLabel;
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch(msg) {
         case WM_CREATE:
-            CreateWindowW(L"Static", L"Enter numbers separated by commas (e.g., 10, 20, 30):",
+        {
+            HFONT hFont = CreateFontW(18, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY, VARIABLE_PITCH, L"Segoe UI");
+            
+            HWND hLabel1 = CreateWindowW(L"Static", L"Enter numbers separated by commas (e.g., 10, 20, 30):",
                           WS_VISIBLE | WS_CHILD, 20, 20, 400, 20, hwnd, NULL, NULL, NULL);
+            SendMessage(hLabel1, WM_SETFONT, (WPARAM)hFont, TRUE);
 
             hInputBox = CreateWindowW(L"Edit", L"",
                                       WS_VISIBLE | WS_CHILD | WS_BORDER | ES_AUTOHSCROLL,
                                       20, 50, 400, 25, hwnd, (HMENU)ID_INPUT_TEXT, NULL, NULL);
+            SendMessage(hInputBox, WM_SETFONT, (WPARAM)hFont, TRUE);
 
             hCalcButton = CreateWindowW(L"Button", L"Calculate Average",
                                         WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
                                         150, 90, 150, 35, hwnd, (HMENU)ID_CALC_BUTTON, NULL, NULL);
+            SendMessage(hCalcButton, WM_SETFONT, (WPARAM)hFont, TRUE);
 
             hResultLabel = CreateWindowW(L"Static", L"Average: --",
                                          WS_VISIBLE | WS_CHILD, 20, 150, 400, 30, hwnd, (HMENU)ID_RESULT_LABEL, NULL, NULL);
+            SendMessage(hResultLabel, WM_SETFONT, (WPARAM)hFont, TRUE);
             break;
+        }
 
         case WM_COMMAND:
             if (LOWORD(wParam) == ID_CALC_BUTTON) {
@@ -109,7 +117,7 @@ void launch_native_gui(void) {
     // Create the window
     HWND hwnd = CreateWindowW(
         wc.lpszClassName,
-        L"Calc-Avg 2.8 Graphical User Interface (GUI)",
+        L"Calc-Avg V5.5 Graphical User Interface",
         WS_OVERLAPPEDWINDOW | WS_VISIBLE,
         CW_USEDEFAULT, CW_USEDEFAULT, 460, 250,
         NULL, NULL, hInstance, NULL
