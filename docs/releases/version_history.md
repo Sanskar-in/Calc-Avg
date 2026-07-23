@@ -2,11 +2,11 @@
 // =============================================================================
 // (c) Copyright Sanskar. All rights reserved.
 // Made by the Sanskar.
-// See this open source project created via Sanskar on GitHub to calculate the average of any numbers via using this link:- "https://www.github.com/Sanskar-in/Calc-Avg"
+// See this open source project created via Sanskar on GitHub to calculate the average of any numbers via using this link:- "https://www.github.com/sanskarIN/Calc-Avg"
 //
 // Follow Sanskar or Creator on:-
-// GitHub:- "https://www.github.com/Sanskar-in"
-// YouTube:- "https://youtube.com/@Sanskar-in"
+// GitHub:- "https://www.github.com/sanskarIN"
+// YouTube:- "https://youtube.com/@sanskarIN"
 // LinkedIn:- "https://www.linkedin.com/in/sanskar-in/"
 // X (Formally known as Twitter):- "https://www.x.com/Sanskar_in"
 // Need support:- supportramsandesh@gmail.com
@@ -191,6 +191,7 @@ This document chronicles the legendary evolution of the **Calc-Avg** project, hi
 *Calc-Avg is a 100% open-source C framework developed by Sanskar.*
 
 ## Versions
+- **v5.5.1.0** - The Open Source Alignment Update (sanskarIN GitHub Profile Update)
 - **v5.5.0.0** - The Native GUI Polish Update (Win32 Font Modernization & Version Sync)
 - **v5.4.0.0** - The Terminal Aesthetics Update (Matrix Digital Rain CLI Visualizer)
 - **v5.3.0.0** - The Masterpiece Edition (UI Synchronization & GitHub Actions CI/CD)

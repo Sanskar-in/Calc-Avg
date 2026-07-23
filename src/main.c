@@ -1,11 +1,11 @@
 // =============================================================================
 // (c) Copyright Sanskar. All rights reserved.
 // Made by the Sanskar.
-// See this open source project created via Sanskar on GitHub to calculate the average of any numbers via using this link:- "https://www.github.com/Sanskar-in/Calc-Avg"
+// See this open source project created via Sanskar on GitHub to calculate the average of any numbers via using this link:- "https://www.github.com/sanskarIN/Calc-Avg"
 //
 // Follow Sanskar or Creator on:-
-// GitHub:- "https://www.github.com/Sanskar-in"
-// YouTube:- "https://youtube.com/@Sanskar-in"
+// GitHub:- "https://www.github.com/sanskarIN"
+// YouTube:- "https://youtube.com/@sanskarIN"
 // LinkedIn:- "https://www.linkedin.com/in/sanskar-in/"
 // X (Formally known as Twitter):- "https://www.x.com/Sanskar_in"
 // Need support:- supportramsandesh@gmail.com
@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
     printf(COLOR_CYAN COLOR_BOLD "// =============================================================================\n" COLOR_RESET);
     printf(COLOR_CYAN COLOR_BOLD "// (c) Copyright Sanskar. All rights reserved.\n" COLOR_RESET);
     printf(COLOR_CYAN COLOR_BOLD "// Made by the Sanskar.\n" COLOR_RESET);
-    printf(COLOR_CYAN COLOR_BOLD "// See this open source project created via Sanskar on GitHub to calculate the average of any numbers via using this link:- \"https://www.github.com/Sanskar-in/Calc-Avg\"\n" COLOR_RESET);
+    printf(COLOR_CYAN COLOR_BOLD "// See this open source project created via Sanskar on GitHub to calculate the average of any numbers via using this link:- \"https://www.github.com/sanskarIN/Calc-Avg\"\n" COLOR_RESET);
     printf(COLOR_CYAN COLOR_BOLD "// =============================================================================\n" COLOR_RESET);
     printf(COLOR_GREEN COLOR_BOLD "\nWelcome to Calc-Avg by Sanskar!\n" COLOR_RESET);
 
@@ -636,8 +636,8 @@ int main(int argc, char *argv[])
         case 23:
             printf(COLOR_CYAN COLOR_BOLD "\n=========================================\n" COLOR_RESET);
             printf(COLOR_YELLOW "Follow Sanskar or Creator on:-\n" COLOR_RESET);
-            printf("GitHub:- " COLOR_GREEN "https://www.github.com/Sanskar-in\n" COLOR_RESET);
-            printf("YouTube:- " COLOR_GREEN "https://youtube.com/@Sanskar-in\n" COLOR_RESET);
+            printf("GitHub:- " COLOR_GREEN "https://www.github.com/sanskarIN\n" COLOR_RESET);
+            printf("YouTube:- " COLOR_GREEN "https://youtube.com/@sanskarIN\n" COLOR_RESET);
             printf("LinkedIn:- " COLOR_GREEN "https://www.linkedin.com/in/sanskar-in/\n" COLOR_RESET);
             printf("X (Formally known as Twitter):- " COLOR_GREEN "https://www.x.com/Sanskar_in\n" COLOR_RESET);
             printf("Need support:- " COLOR_GREEN "supportramsandesh@gmail.com\n" COLOR_RESET);
@@ -871,13 +871,13 @@ int main(int argc, char *argv[])
             break;
         }
         case 34:
-            printf(COLOR_CYAN "\nRedirecting to GitHub: https://www.github.com/Sanskar-in/Calc-Avg\n" COLOR_RESET);
+            printf(COLOR_CYAN "\nRedirecting to GitHub: https://www.github.com/sanskarIN/Calc-Avg\n" COLOR_RESET);
 #if defined(_WIN32)
-            system("start https://www.github.com/Sanskar-in/Calc-Avg");
+            system("start https://www.github.com/sanskarIN/Calc-Avg");
 #elif defined(__APPLE__)
-            system("open https://www.github.com/Sanskar-in/Calc-Avg");
+            system("open https://www.github.com/sanskarIN/Calc-Avg");
 #else
-            system("xdg-open https://www.github.com/Sanskar-in/Calc-Avg");
+            system("xdg-open https://www.github.com/sanskarIN/Calc-Avg");
 #endif
             break;
         case 35:

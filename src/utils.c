@@ -1,11 +1,11 @@
 // =============================================================================
 // (c) Copyright Sanskar. All rights reserved.
 // Made by the Sanskar.
-// See this open source project created via Sanskar on GitHub to calculate the average of any numbers via using this link:- "https://www.github.com/Sanskar-in/Calc-Avg"
+// See this open source project created via Sanskar on GitHub to calculate the average of any numbers via using this link:- "https://www.github.com/sanskarIN/Calc-Avg"
 // 
 // Follow Sanskar or Creator on:-
-// GitHub:- "https://www.github.com/Sanskar-in"
-// YouTube:- "https://youtube.com/@Sanskar-in"
+// GitHub:- "https://www.github.com/sanskarIN"
+// YouTube:- "https://youtube.com/@sanskarIN"
 // LinkedIn:- "https://www.linkedin.com/in/sanskar-in/"
 // X (Formally known as Twitter):- "https://www.x.com/Sanskar_in"
 // Need support:- supportramsandesh@gmail.com
@@ -215,7 +215,7 @@ void generate_html_report(double numbers[], int count, const char *report_filena
     
     fprintf(file, "<div class=\"footer\">\n");
     fprintf(file, "<p>&copy; Copyright Sanskar. Open-Source Project.</p>\n");
-    fprintf(file, "<p><a href=\"https://www.github.com/Sanskar-in/Calc-Avg\">View on GitHub</a></p>\n");
+    fprintf(file, "<p><a href=\"https://www.github.com/sanskarIN/Calc-Avg\">View on GitHub</a></p>\n");
     fprintf(file, "</div>\n</div>\n</body>\n</html>\n");
     
     fclose(file);

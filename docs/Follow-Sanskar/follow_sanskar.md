@@ -2,11 +2,11 @@
 // =============================================================================
 // (c) Copyright Sanskar. All rights reserved.
 // Made by the Sanskar.
-// See this open source project created via Sanskar on GitHub to calculate the average of any numbers via using this link:- "https://www.github.com/Sanskar-in/Calc-Avg"
+// See this open source project created via Sanskar on GitHub to calculate the average of any numbers via using this link:- "https://www.github.com/sanskarIN/Calc-Avg"
 //
 // Follow Sanskar or Creator on:-
-// GitHub:- "https://www.github.com/Sanskar-in"
-// YouTube:- "https://youtube.com/@Sanskar-in"
+// GitHub:- "https://www.github.com/sanskarIN"
+// YouTube:- "https://youtube.com/@sanskarIN"
 // LinkedIn:- "https://www.linkedin.com/in/sanskar-in/"
 // X (Formally known as Twitter):- "https://www.x.com/Sanskar_in"
 // Need support:- supportramsandesh@gmail.com
@@ -19,8 +19,8 @@
 Thank you for using **Calc-Avg**! This project was proudly created by **Sanskar**. If you want to follow the creator's journey, request new software, or need support, you can find all official contact and social links below:
 
 ## 🌐 Social Media & Platforms
-- **GitHub**: [https://www.github.com/Sanskar-in](https://www.github.com/Sanskar-in)
-- **YouTube**: [https://youtube.com/@Sanskar-in](https://youtube.com/@Sanskar-in)
+- **GitHub**: [https://www.github.com/sanskarIN](https://www.github.com/sanskarIN)
+- **YouTube**: [https://youtube.com/@sanskarIN](https://youtube.com/@sanskarIN)
 - **LinkedIn**: [https://www.linkedin.com/in/sanskar-in/](https://www.linkedin.com/in/sanskar-in/)
 - **X (Formally known as Twitter)**: [https://www.x.com/Sanskar_in](https://www.x.com/Sanskar_in)
 

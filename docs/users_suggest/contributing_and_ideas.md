@@ -2,7 +2,7 @@
 // =============================================================================
 // (c) Copyright Sanskar. All rights reserved.
 // Made by the Sanskar.
-// See this open source project created via Sanskar on GitHub to calculate the average of any numbers via using this link:- "https://www.github.com/Sanskar-in/Calc-Avg"
+// See this open source project created via Sanskar on GitHub to calculate the average of any numbers via using this link:- "https://www.github.com/sanskarIN/Calc-Avg"
 // =============================================================================
 -->
 
@@ -14,7 +14,7 @@ Calc-Avg is an open-source project by **Sanskar**! We heavily rely on the commun
 
 If you are a user and have a brilliant idea for the next feature (e.g., adding GUI support, supporting JSON files, or adding calculus functions):
 
-1. **Visit the GitHub Repository:** Navigate to [https://www.github.com/Sanskar-in/Calc-Avg](https://www.github.com/Sanskar-in/Calc-Avg).
+1. **Visit the GitHub Repository:** Navigate to [https://www.github.com/sanskarIN/Calc-Avg](https://www.github.com/sanskarIN/Calc-Avg).
 2. **Open an Issue:** Click on the "Issues" tab.
 3. **Submit a Feature Request:** Click "New Issue", give it a clear title (e.g., "Feature Request: JSON Support"), and thoroughly explain what you want the feature to do.
 

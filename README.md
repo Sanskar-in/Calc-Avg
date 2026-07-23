@@ -2,7 +2,7 @@
 // =============================================================================
 // (c) Copyright Sanskar. All rights reserved.
 // Made by the Sanskar.
-// See this open source project created via Sanskar on GitHub to calculate the average of any numbers via using this link:- "https://www.github.com/Sanskar-in/Calc-Avg"
+// See this open source project created via Sanskar on GitHub to calculate the average of any numbers via using this link:- "https://www.github.com/sanskarIN/Calc-Avg"
 // =============================================================================
 -->
 
@@ -11,7 +11,7 @@
 Welcome to **Calc-Avg**, a highly advanced, open-source C project created by **Sanskar**.
 This tool goes far beyond simple addition and division—it is a comprehensive, feature-rich statistical analysis suite built entirely for the terminal. With lightning-fast command-line argument processing, beautiful ANSI-colored interfaces, and advanced mathematical algorithms, Calc-Avg is the only average calculator you will ever need.
 
-🔗 **GitHub Repository:** [https://www.github.com/Sanskar-in/Calc-Avg](https://www.github.com/Sanskar-in/Calc-Avg)
+🔗 **GitHub Repository:** [https://www.github.com/sanskarIN/Calc-Avg](https://www.github.com/sanskarIN/Calc-Avg)
 
 ---
 
@@ -165,10 +165,10 @@ Calc-Avg/
 
 ## 🌍 Follow Sanskar (Creator)
 
-This open-source project is proudly created and maintained by **Sanskar**. You can read the full creator documentation in [docs/Follow-Sanskar/follow_sanskar.md](https://github.com/Sanskar-in/Calc-Avg/blob/main/docs/Follow-Sanskar/follow_sanskar.md) or use the links below:
+This open-source project is proudly created and maintained by **Sanskar**. You can read the full creator documentation in [docs/Follow-Sanskar/follow_sanskar.md](https://github.com/sanskarIN/Calc-Avg/blob/main/docs/Follow-Sanskar/follow_sanskar.md) or use the links below:
 
-- **GitHub**: [https://www.github.com/Sanskar-in](https://www.github.com/Sanskar-in)
-- **YouTube**: [https://youtube.com/@Sanskar-in](https://youtube.com/@Sanskar-in)
+- **GitHub**: [https://www.github.com/sanskarIN](https://www.github.com/sanskarIN)
+- **YouTube**: [https://youtube.com/@sanskarIN](https://youtube.com/@sanskarIN)
 - **LinkedIn**: [https://www.linkedin.com/in/sanskar-in/](https://www.linkedin.com/in/sanskar-in/)
 - **X (Formally known as Twitter)**: [https://www.x.com/Sanskar_in](https://www.x.com/Sanskar_in)
 
@@ -179,7 +179,7 @@ This open-source project is proudly created and maintained by **Sanskar**. You c
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/Sanskar-in/Calc-Avg/blob/main/LICENSE) file for details. This means you are free to use, modify, and distribute this software however you like, as long as you provide attribution back to Sanskar.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/sanskarIN/Calc-Avg/blob/main/LICENSE) file for details. This means you are free to use, modify, and distribute this software however you like, as long as you provide attribution back to Sanskar.
 
 ---
 

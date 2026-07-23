@@ -1,7 +1,7 @@
 # =============================================================================
 # (c) Copyright Sanskar. All rights reserved.
 # Made by the Sanskar.
-# See this open source project created via Sanskar on GitHub to calculate the average of any numbers via using this link:- "https://www.github.com/Sanskar-in/Calc-Avg"
+# See this open source project created via Sanskar on GitHub to calculate the average of any numbers via using this link:- "https://www.github.com/sanskarIN/Calc-Avg"
 # =============================================================================
 # File Purpose: Makefile to build the project.
 
