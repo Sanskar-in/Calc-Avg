@@ -7,7 +7,7 @@
 // Follow Sanskar or Creator on:-
 // GitHub:- "https://www.github.com/sanskarIN"
 // YouTube:- "https://youtube.com/@sanskarIN"
-// LinkedIn:- "https://www.linkedin.com/in/sanskar-in/"
+// LinkedIn:- "https://www.linkedin.com/in/sanskarIN"
 // X (Formally known as Twitter):- "https://www.x.com/Sanskar_in"
 // Need support:- supportramsandesh@gmail.com
 // Want to make your own projects, apps, and games via Sanskar:- sanskaryadavfrom2012to2026@gmail.com
@@ -21,7 +21,7 @@ Thank you for using **Calc-Avg**! This project was proudly created by **Sanskar*
 ## 🌐 Social Media & Platforms
 - **GitHub**: [https://www.github.com/sanskarIN](https://www.github.com/sanskarIN)
 - **YouTube**: [https://youtube.com/@sanskarIN](https://youtube.com/@sanskarIN)
-- **LinkedIn**: [https://www.linkedin.com/in/sanskar-in/](https://www.linkedin.com/in/sanskar-in/)
+- **LinkedIn**: [https://www.linkedin.com/in/sanskarIN](https://www.linkedin.com/in/sanskarIN)
 - **X (Formally known as Twitter)**: [https://www.x.com/Sanskar_in](https://www.x.com/Sanskar_in)
 
 ## ✉️ Contact & Support

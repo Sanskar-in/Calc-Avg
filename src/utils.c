@@ -6,7 +6,7 @@
 // Follow Sanskar or Creator on:-
 // GitHub:- "https://www.github.com/sanskarIN"
 // YouTube:- "https://youtube.com/@sanskarIN"
-// LinkedIn:- "https://www.linkedin.com/in/sanskar-in/"
+// LinkedIn:- "https://www.linkedin.com/in/sanskarIN"
 // X (Formally known as Twitter):- "https://www.x.com/Sanskar_in"
 // Need support:- supportramsandesh@gmail.com
 // Want to make your own projects, apps, and games via Sanskar:- sanskaryadavfrom2012to2026@gmail.com

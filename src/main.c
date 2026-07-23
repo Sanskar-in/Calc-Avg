@@ -6,7 +6,7 @@
 // Follow Sanskar or Creator on:-
 // GitHub:- "https://www.github.com/sanskarIN"
 // YouTube:- "https://youtube.com/@sanskarIN"
-// LinkedIn:- "https://www.linkedin.com/in/sanskar-in/"
+// LinkedIn:- "https://www.linkedin.com/in/sanskarIN"
 // X (Formally known as Twitter):- "https://www.x.com/Sanskar_in"
 // Need support:- supportramsandesh@gmail.com
 // Want to make your own projects, apps, and games via Sanskar:- sanskaryadavfrom2012to2026@gmail.com
@@ -638,7 +638,7 @@ int main(int argc, char *argv[])
             printf(COLOR_YELLOW "Follow Sanskar or Creator on:-\n" COLOR_RESET);
             printf("GitHub:- " COLOR_GREEN "https://www.github.com/sanskarIN\n" COLOR_RESET);
             printf("YouTube:- " COLOR_GREEN "https://youtube.com/@sanskarIN\n" COLOR_RESET);
-            printf("LinkedIn:- " COLOR_GREEN "https://www.linkedin.com/in/sanskar-in/\n" COLOR_RESET);
+            printf("LinkedIn:- " COLOR_GREEN "https://www.linkedin.com/in/sanskarIN\n" COLOR_RESET);
             printf("X (Formally known as Twitter):- " COLOR_GREEN "https://www.x.com/Sanskar_in\n" COLOR_RESET);
             printf("Need support:- " COLOR_GREEN "supportramsandesh@gmail.com\n" COLOR_RESET);
             printf("Want to make your own projects, apps, and games via Sanskar:- " COLOR_GREEN "sanskaryadavfrom2012to2026@gmail.com\n" COLOR_RESET);
